@@ -156,6 +156,10 @@ public class MainActivity extends AppCompatActivity {
                                             .withAboutDescription("Developed By Adithya J")
                                             .start(MainActivity.this);
                                     break;
+
+                                default:
+                                    switchFragment("Fund Flow", "FundFlow");
+                                    break;
                             }
                         } else {
                             flag = false;

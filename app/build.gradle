@@ -18,7 +18,7 @@ android {
     lintOptions {
         abortOnError false
     }
-    
+
     defaultConfig {
         applicationId "com.adithya321.sharesanalysis"
         minSdkVersion 16

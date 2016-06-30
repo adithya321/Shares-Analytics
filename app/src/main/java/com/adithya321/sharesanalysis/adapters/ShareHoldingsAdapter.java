@@ -91,11 +91,15 @@ public class ShareHoldingsAdapter extends RecyclerView.Adapter<ShareHoldingsAdap
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
         Share share = mShares.get(position);
 
-        int totalSharesPurchased = 0, totalSharesSold = 0;
-        double totalValuePurchased = 0, totalValueSold = 0;
+        int totalSharesPurchased = 0;
+        int totalSharesSold = 0;
+        double totalValuePurchased = 0;
+        double totalValueSold = 0;
         double averageShareValue = 0;
         double percentageChange = 0;
-        double totalProfit = 0, targetTotalProfit = 0, reward = 0;
+        double totalProfit = 0;
+        double targetTotalProfit = 0;
+        double reward = 0;
         double currentStockValue = 0;
 
         RealmList<Purchase> purchases = share.getPurchases();

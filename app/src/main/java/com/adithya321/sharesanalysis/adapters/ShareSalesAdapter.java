@@ -85,8 +85,11 @@ public class ShareSalesAdapter extends RecyclerView.Adapter<ShareSalesAdapter.Vi
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
         Share share = mShares.get(position);
 
-        int totalSharesSold = 0, totalSharesPurchased = 0, currentNoOfShares = 0;
-        double totalValueSold = 0, totalValuePurchased = 0;
+        int totalSharesSold = 0;
+        int totalSharesPurchased = 0;
+        int currentNoOfShares = 0;
+        double totalValueSold = 0;
+        double totalValuePurchased = 0;
         double averageShareValue = 0;
         double targetSalePrice = 0;
         double difference = 0;
