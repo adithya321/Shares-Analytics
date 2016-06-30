@@ -21,8 +21,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.adithya321.sharesanalysis.R;
-import com.adithya321.sharesanalysis.database.Fund;
 import com.adithya321.sharesanalysis.database.DatabaseHandler;
+import com.adithya321.sharesanalysis.database.Fund;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

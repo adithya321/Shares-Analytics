@@ -117,10 +117,17 @@ public class ShareHoldingsFragment extends Fragment implements OnStartDragListen
             try {
                 for (int i = 0; i < shares.size(); i++) {
                     Share share = shares.get(i);
-                    String url = "https://in.finance.yahoo.com/q?s=" + share.getName() + ".NS";
+                    String name = share.getName();
+                    String code = "";
+                    int j = 0;
+                    while (name.charAt(j) != ' ') {
+                        code += name.charAt(j);
+                        j++;
+                    }
+                    String url = "https://in.finance.yahoo.com/q?s=" + code + ".NS";
                     Document document = Jsoup.connect(url).followRedirects(true).get();
                     try {
-                        currentShareValue = document.getElementById("yfs_l84_" + share.getName().toLowerCase()
+                        currentShareValue = document.getElementById("yfs_l84_" + code.toLowerCase()
                                 + ".ns").html();
                         Realm realm = db.getRealmInstance();
                         realm.beginTransaction();

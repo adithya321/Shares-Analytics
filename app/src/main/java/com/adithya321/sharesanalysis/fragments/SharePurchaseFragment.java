@@ -11,11 +11,13 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -31,6 +33,9 @@ import com.adithya321.sharesanalysis.database.Share;
 import com.adithya321.sharesanalysis.recyclerviewdrag.OnStartDragListener;
 import com.adithya321.sharesanalysis.recyclerviewdrag.SimpleItemTouchHelperCallback;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -69,7 +74,23 @@ public class SharePurchaseFragment extends Fragment implements OnStartDragListen
                         WindowManager.LayoutParams.WRAP_CONTENT);
                 dialog.show();
 
-                final EditText name = (EditText) dialog.findViewById(R.id.share_name);
+                final AutoCompleteTextView name = (AutoCompleteTextView) dialog.findViewById(R.id.share_name);
+                final List<String> nseList = new ArrayList<>();
+                try {
+                    InputStream inputStream = getActivity().getAssets().open("NSE-datasets-codes.csv");
+                    InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                    BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                    String line;
+                    while ((line = bufferedReader.readLine()) != null) {
+                        nseList.add(line);
+                    }
+                    ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(getContext(),
+                            android.R.layout.simple_dropdown_item_1line, nseList);
+                    name.setAdapter(arrayAdapter);
+                } catch (Exception e) {
+                    Log.e("AutoComplete", e.toString());
+                }
+
                 final Spinner spinner = (Spinner) dialog.findViewById(R.id.existing_spinner);
 
                 ArrayList<String> shares = new ArrayList<>();
