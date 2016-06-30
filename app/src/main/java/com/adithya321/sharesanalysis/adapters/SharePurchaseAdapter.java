@@ -12,9 +12,8 @@ import com.adithya321.sharesanalysis.R;
 import com.adithya321.sharesanalysis.database.DatabaseHandler;
 import com.adithya321.sharesanalysis.database.Purchase;
 import com.adithya321.sharesanalysis.database.Share;
-import com.adithya321.sharesanalysis.recyclerViewDrag.ItemTouchHelperAdapter;
-import com.adithya321.sharesanalysis.recyclerViewDrag.ItemTouchHelperViewHolder;
-import com.adithya321.sharesanalysis.recyclerViewDrag.OnStartDragListener;
+import com.adithya321.sharesanalysis.recyclerviewdrag.ItemTouchHelperAdapter;
+import com.adithya321.sharesanalysis.recyclerviewdrag.ItemTouchHelperViewHolder;
 import com.adithya321.sharesanalysis.utils.NumberUtils;
 
 import java.util.Calendar;
@@ -30,7 +29,6 @@ public class SharePurchaseAdapter extends RecyclerView.Adapter<SharePurchaseAdap
     private Context mContext;
     private List<Share> mShares;
     private static OnItemClickListener listener;
-    private final OnStartDragListener mDragStartListener;
 
     public interface OnItemClickListener {
         void onItemClick(View itemView, int position);
@@ -75,8 +73,7 @@ public class SharePurchaseAdapter extends RecyclerView.Adapter<SharePurchaseAdap
         }
     }
 
-    public SharePurchaseAdapter(Context context, List<Share> shares, OnStartDragListener dragStartListener) {
-        mDragStartListener = dragStartListener;
+    public SharePurchaseAdapter(Context context, List<Share> shares) {
         mContext = context;
         mShares = shares;
     }

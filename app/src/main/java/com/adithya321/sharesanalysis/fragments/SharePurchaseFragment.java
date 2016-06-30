@@ -28,8 +28,8 @@ import com.adithya321.sharesanalysis.adapters.SharePurchaseAdapter;
 import com.adithya321.sharesanalysis.database.DatabaseHandler;
 import com.adithya321.sharesanalysis.database.Purchase;
 import com.adithya321.sharesanalysis.database.Share;
-import com.adithya321.sharesanalysis.recyclerViewDrag.OnStartDragListener;
-import com.adithya321.sharesanalysis.recyclerViewDrag.SimpleItemTouchHelperCallback;
+import com.adithya321.sharesanalysis.recyclerviewdrag.OnStartDragListener;
+import com.adithya321.sharesanalysis.recyclerviewdrag.SimpleItemTouchHelperCallback;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -199,7 +199,7 @@ public class SharePurchaseFragment extends Fragment implements OnStartDragListen
 
     private void setRecyclerViewAdapter() {
         sharesList = databaseHandler.getShares();
-        SharePurchaseAdapter sharesAdapter = new SharePurchaseAdapter(getContext(), sharesList, this);
+        SharePurchaseAdapter sharesAdapter = new SharePurchaseAdapter(getContext(), sharesList);
         sharesAdapter.setOnItemClickListener(new SharePurchaseAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {

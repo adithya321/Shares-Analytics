@@ -1,4 +1,4 @@
-package com.adithya321.sharesanalysis.recyclerViewDrag;
+package com.adithya321.sharesanalysis.recyclerviewdrag;
 
 import android.support.v7.widget.RecyclerView;
 

@@ -1,4 +1,4 @@
-package com.adithya321.sharesanalysis.recyclerViewDrag;
+package com.adithya321.sharesanalysis.recyclerviewdrag;
 
 import android.graphics.Canvas;
 import android.support.v7.widget.GridLayoutManager;
@@ -50,6 +50,7 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int i) {
+        //Not using swipe to dismiss
     }
 
     @Override
@@ -65,11 +66,9 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
     @Override
     public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
-        if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
-            if (viewHolder instanceof ItemTouchHelperViewHolder) {
-                ItemTouchHelperViewHolder itemViewHolder = (ItemTouchHelperViewHolder) viewHolder;
-                itemViewHolder.onItemSelected();
-            }
+        if (actionState != ItemTouchHelper.ACTION_STATE_IDLE && viewHolder instanceof ItemTouchHelperViewHolder) {
+            ItemTouchHelperViewHolder itemViewHolder = (ItemTouchHelperViewHolder) viewHolder;
+            itemViewHolder.onItemSelected();
         }
 
         super.onSelectedChanged(viewHolder, actionState);

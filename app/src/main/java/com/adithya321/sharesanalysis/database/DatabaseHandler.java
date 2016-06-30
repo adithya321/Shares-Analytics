@@ -104,6 +104,9 @@ public class DatabaseHandler {
             case "share":
                 maxId = realm.where(Share.class).max("id");
                 break;
+
+            default:
+                return 0;
         }
         if (maxId == null) return 0;
         else return Long.parseLong(maxId.toString()) + 1;

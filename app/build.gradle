@@ -23,8 +23,8 @@ android {
         applicationId "com.adithya321.sharesanalysis"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 9
-        versionName "0.10"
+        versionCode 10
+        versionName "0.11"
 
         vectorDrawables.useSupportLibrary = true
     }

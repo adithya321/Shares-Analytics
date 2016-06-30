@@ -22,8 +22,8 @@ import com.adithya321.sharesanalysis.adapters.ShareHoldingsAdapter;
 import com.adithya321.sharesanalysis.database.DatabaseHandler;
 import com.adithya321.sharesanalysis.database.Purchase;
 import com.adithya321.sharesanalysis.database.Share;
-import com.adithya321.sharesanalysis.recyclerViewDrag.OnStartDragListener;
-import com.adithya321.sharesanalysis.recyclerViewDrag.SimpleItemTouchHelperCallback;
+import com.adithya321.sharesanalysis.recyclerviewdrag.OnStartDragListener;
+import com.adithya321.sharesanalysis.recyclerviewdrag.SimpleItemTouchHelperCallback;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -62,7 +62,7 @@ public class ShareHoldingsFragment extends Fragment implements OnStartDragListen
 
     private void setRecyclerViewAdapter() {
         sharesList = databaseHandler.getShares();
-        shareHoldingsAdapter = new ShareHoldingsAdapter(getContext(), sharesList, this);
+        shareHoldingsAdapter = new ShareHoldingsAdapter(getContext(), sharesList);
         shareHoldingsAdapter.setOnItemClickListener(new ShareHoldingsAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
