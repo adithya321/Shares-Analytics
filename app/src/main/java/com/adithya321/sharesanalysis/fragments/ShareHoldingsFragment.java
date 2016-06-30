@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,6 +22,8 @@ import com.adithya321.sharesanalysis.adapters.ShareHoldingsAdapter;
 import com.adithya321.sharesanalysis.database.DatabaseHandler;
 import com.adithya321.sharesanalysis.database.Purchase;
 import com.adithya321.sharesanalysis.database.Share;
+import com.adithya321.sharesanalysis.recyclerViewDrag.OnStartDragListener;
+import com.adithya321.sharesanalysis.recyclerViewDrag.SimpleItemTouchHelperCallback;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -30,13 +33,14 @@ import java.util.List;
 import io.realm.Realm;
 import io.realm.RealmList;
 
-public class ShareHoldingsFragment extends Fragment {
+public class ShareHoldingsFragment extends Fragment implements OnStartDragListener {
 
     private DatabaseHandler databaseHandler;
     private List<Share> sharesList;
     private ShareHoldingsAdapter shareHoldingsAdapter;
     private MenuItem actionProgressItem, actionRefreshItem;
     private RecyclerView shareHoldingsRecyclerView;
+    private ItemTouchHelper mItemTouchHelper;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -58,7 +62,7 @@ public class ShareHoldingsFragment extends Fragment {
 
     private void setRecyclerViewAdapter() {
         sharesList = databaseHandler.getShares();
-        shareHoldingsAdapter = new ShareHoldingsAdapter(getContext(), sharesList);
+        shareHoldingsAdapter = new ShareHoldingsAdapter(getContext(), sharesList, this);
         shareHoldingsAdapter.setOnItemClickListener(new ShareHoldingsAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
@@ -81,6 +85,13 @@ public class ShareHoldingsFragment extends Fragment {
         });
         shareHoldingsRecyclerView.setAdapter(shareHoldingsAdapter);
         shareHoldingsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        shareHoldingsRecyclerView.setHasFixedSize(true);
+        shareHoldingsRecyclerView.setAdapter(shareHoldingsAdapter);
+        shareHoldingsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(shareHoldingsAdapter);
+        mItemTouchHelper = new ItemTouchHelper(callback);
+        mItemTouchHelper.attachToRecyclerView(shareHoldingsRecyclerView);
         new CurrentShareValue().execute();
     }
 
@@ -154,5 +165,10 @@ public class ShareHoldingsFragment extends Fragment {
             new CurrentShareValue().execute();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
+        mItemTouchHelper.startDrag(viewHolder);
     }
 }

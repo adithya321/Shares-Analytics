@@ -89,7 +89,7 @@ public class FundFlowFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         Fund fund = new Fund();
-                        fund.setId(databaseHandler.getNextKey());
+                        fund.setId(databaseHandler.getNextKey("fund"));
 
                         String stringStartDate = year_start + " " + month_start + " " + day_start;
                         DateFormat format = new SimpleDateFormat("yyyy MM dd", Locale.ENGLISH);

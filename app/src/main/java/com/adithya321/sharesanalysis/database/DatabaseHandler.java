@@ -69,7 +69,7 @@ public class DatabaseHandler {
         return true;
     }
 
-    public void updateShare(Share share){
+    public void updateShare(Share share) {
         realm.beginTransaction();
         realm.copyToRealmOrUpdate(share);
         realm.commitTransaction();
@@ -87,7 +87,7 @@ public class DatabaseHandler {
     }
 
     public ArrayList<Share> getShares() {
-        RealmResults<Share> results = realm.where(Share.class).findAll();
+        RealmResults<Share> results = realm.where(Share.class).findAllSorted("id");
         ArrayList<Share> shares = new ArrayList<>();
         for (int i = 0; i < results.size(); i++) {
             shares.add(results.get(i));
@@ -95,9 +95,17 @@ public class DatabaseHandler {
         return shares;
     }
 
-    public long getNextKey() {
-        Number id = realm.where(Fund.class).max("id");
-        if (id == null) return 0;
-        else return Long.parseLong(id.toString()) + 1;
+    public long getNextKey(String where) {
+        Number maxId = null;
+        switch (where) {
+            case "fund":
+                maxId = realm.where(Fund.class).max("id");
+                break;
+            case "share":
+                maxId = realm.where(Share.class).max("id");
+                break;
+        }
+        if (maxId == null) return 0;
+        else return Long.parseLong(maxId.toString()) + 1;
     }
 }

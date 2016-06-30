@@ -2,6 +2,7 @@ package com.adithya321.sharesanalysis.adapters;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,22 +10,30 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.adithya321.sharesanalysis.R;
+import com.adithya321.sharesanalysis.database.DatabaseHandler;
 import com.adithya321.sharesanalysis.database.Purchase;
 import com.adithya321.sharesanalysis.database.Share;
+import com.adithya321.sharesanalysis.recyclerViewDrag.ItemTouchHelperAdapter;
+import com.adithya321.sharesanalysis.recyclerViewDrag.ItemTouchHelperViewHolder;
+import com.adithya321.sharesanalysis.recyclerViewDrag.OnStartDragListener;
 import com.adithya321.sharesanalysis.utils.DateUtils;
 import com.adithya321.sharesanalysis.utils.NumberUtils;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import io.realm.Realm;
 import io.realm.RealmList;
 
-public class ShareSalesAdapter extends RecyclerView.Adapter<ShareSalesAdapter.ViewHolder> {
+public class ShareSalesAdapter extends RecyclerView.Adapter<ShareSalesAdapter.ViewHolder>
+        implements ItemTouchHelperAdapter {
 
     private Context mContext;
     private List<Share> mShares;
     private static OnItemClickListener listener;
+    private final OnStartDragListener mDragStartListener;
 
     public interface OnItemClickListener {
         void onItemClick(View itemView, int position);
@@ -34,7 +43,7 @@ public class ShareSalesAdapter extends RecyclerView.Adapter<ShareSalesAdapter.Vi
         this.listener = listener;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
         public final TextView name;
         public final TextView totalSharesPurchased;
         public final TextView totalValue;
@@ -61,9 +70,20 @@ public class ShareSalesAdapter extends RecyclerView.Adapter<ShareSalesAdapter.Vi
                 }
             });
         }
+
+        @Override
+        public void onItemSelected() {
+            itemView.setBackgroundColor(Color.LTGRAY);
+        }
+
+        @Override
+        public void onItemClear() {
+            itemView.setBackgroundColor(Color.WHITE);
+        }
     }
 
-    public ShareSalesAdapter(Context context, List<Share> shares) {
+    public ShareSalesAdapter(Context context, List<Share> shares, OnStartDragListener dragStartListener) {
+        mDragStartListener = dragStartListener;
         mContext = context;
         mShares = shares;
     }
@@ -131,5 +151,20 @@ public class ShareSalesAdapter extends RecyclerView.Adapter<ShareSalesAdapter.Vi
     @Override
     public int getItemCount() {
         return mShares.size();
+    }
+
+    @Override
+    public boolean onItemMove(int fromPosition, int toPosition) {
+        DatabaseHandler databaseHandler = new DatabaseHandler(getContext());
+        Realm realm = databaseHandler.getRealmInstance();
+        realm.beginTransaction();
+        long temp = 999;
+        mShares.get(fromPosition).setId(temp);
+        mShares.get(toPosition).setId(fromPosition);
+        mShares.get(fromPosition).setId(toPosition);
+        realm.commitTransaction();
+        Collections.swap(mShares, fromPosition, toPosition);
+        notifyItemMoved(fromPosition, toPosition);
+        return true;
     }
 }

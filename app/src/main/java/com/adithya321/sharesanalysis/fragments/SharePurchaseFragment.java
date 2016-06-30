@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,8 @@ import com.adithya321.sharesanalysis.adapters.SharePurchaseAdapter;
 import com.adithya321.sharesanalysis.database.DatabaseHandler;
 import com.adithya321.sharesanalysis.database.Purchase;
 import com.adithya321.sharesanalysis.database.Share;
+import com.adithya321.sharesanalysis.recyclerViewDrag.OnStartDragListener;
+import com.adithya321.sharesanalysis.recyclerViewDrag.SimpleItemTouchHelperCallback;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -38,12 +41,13 @@ import java.util.Locale;
 
 import io.realm.RealmList;
 
-public class SharePurchaseFragment extends Fragment {
+public class SharePurchaseFragment extends Fragment implements OnStartDragListener {
 
     private DatabaseHandler databaseHandler;
     private int year_start, month_start, day_start;
     private List<Share> sharesList;
     private RecyclerView sharePurchasesRecyclerView;
+    private ItemTouchHelper mItemTouchHelper;
 
     @Nullable
     @Override
@@ -124,6 +128,7 @@ public class SharePurchaseFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         Share share = new Share();
+                        share.setId(databaseHandler.getNextKey("share"));
                         share.setPurchases(new RealmList<Purchase>());
                         Purchase purchase = new Purchase();
 
@@ -194,7 +199,7 @@ public class SharePurchaseFragment extends Fragment {
 
     private void setRecyclerViewAdapter() {
         sharesList = databaseHandler.getShares();
-        SharePurchaseAdapter sharesAdapter = new SharePurchaseAdapter(getContext(), sharesList);
+        SharePurchaseAdapter sharesAdapter = new SharePurchaseAdapter(getContext(), sharesList, this);
         sharesAdapter.setOnItemClickListener(new SharePurchaseAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
@@ -218,5 +223,18 @@ public class SharePurchaseFragment extends Fragment {
         });
         sharePurchasesRecyclerView.setAdapter(sharesAdapter);
         sharePurchasesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        sharePurchasesRecyclerView.setHasFixedSize(true);
+        sharePurchasesRecyclerView.setAdapter(sharesAdapter);
+        sharePurchasesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(sharesAdapter);
+        mItemTouchHelper = new ItemTouchHelper(callback);
+        mItemTouchHelper.attachToRecyclerView(sharePurchasesRecyclerView);
+    }
+
+    @Override
+    public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
+        mItemTouchHelper.startDrag(viewHolder);
     }
 }

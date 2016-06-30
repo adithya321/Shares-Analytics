@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         AccountHeader accountHeader = new AccountHeaderBuilder()
-                .withHeaderBackground(R.mipmap.ic_launcher)
+                .withHeaderBackground(R.drawable.header)
                 .withCompactStyle(true)
                 .withActivity(this)
                 .addProfiles(

@@ -8,6 +8,7 @@ import io.realm.annotations.PrimaryKey;
 
 public class Share extends RealmObject {
     @PrimaryKey
+    private long id;
     private String name;
     private Date dateOfInitialPurchase;
     private double currentShareValue;
@@ -16,11 +17,21 @@ public class Share extends RealmObject {
     public Share() {
     }
 
-    public Share(String name, Date dateOfInitialPurchase, double currentShareValue, RealmList<Purchase> purchases) {
+    public Share(long id, String name, Date dateOfInitialPurchase, double currentShareValue,
+                 RealmList<Purchase> purchases) {
+        this.id = id;
         this.name = name;
         this.dateOfInitialPurchase = dateOfInitialPurchase;
         this.currentShareValue = currentShareValue;
         this.purchases = purchases;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getName() {
