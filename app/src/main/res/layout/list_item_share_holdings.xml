@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:foreground="?android:attr/selectableItemBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/share_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="SBI"
+            android:textAppearance="?android:textAppearanceLarge" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Average Share Value" />
+
+            <TextView
+                android:id="@+id/average_share_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:text="186.31" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/average_share_value"
+                android:layout_marginTop="8dp"
+                android:text="Current Share Value" />
+
+            <TextView
+                android:id="@+id/current_share_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/average_share_value"
+                android:layout_marginTop="8dp"
+                android:text="210.92" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/current_share_value"
+                android:layout_marginTop="8dp"
+                android:text="% change" />
+
+            <TextView
+                android:id="@+id/percentage_change"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/current_share_value"
+                android:layout_marginTop="8dp"
+                android:text="13.21" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/percentage_change"
+                android:layout_marginTop="8dp"
+                android:text="No of Days" />
+
+            <TextView
+                android:id="@+id/no_of_days"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/percentage_change"
+                android:layout_marginTop="8dp"
+                android:text="93" />
+
+            <!--<TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/no_of_days"
+                android:layout_marginTop="8dp"
+                android:text="Bank Value" />
+
+            <TextView
+                android:id="@+id/bank_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/no_of_days"
+                android:layout_marginTop="8dp"
+                android:text="19176.82" />-->
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/no_of_days"
+                android:layout_marginTop="8dp"
+                android:text="Value sold" />
+
+            <TextView
+                android:id="@+id/value_sold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/no_of_days"
+                android:layout_marginTop="8dp"
+                android:text="20475.30" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/value_sold"
+                android:layout_marginTop="8dp"
+                android:text="Total Profit" />
+
+            <TextView
+                android:id="@+id/total_profit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/value_sold"
+                android:layout_marginTop="8dp"
+                android:text="1844.30" />
+
+            <!--<TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/total_profit"
+                android:layout_marginTop="8dp"
+                android:text="Current Bank Value" />
+
+            <TextView
+                android:id="@+id/current_bank_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/total_profit"
+                android:layout_marginTop="8dp"
+                android:text="0.00" />-->
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/total_profit"
+                android:layout_marginTop="8dp"
+                android:text="Current Stock Value" />
+
+            <TextView
+                android:id="@+id/current_stock_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/total_profit"
+                android:layout_marginTop="8dp"
+                android:text="0.00" />
+
+            <!--<TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/current_stock_value"
+                android:layout_marginTop="8dp"
+                android:text="Nett profit" />
+
+            <TextView
+                android:id="@+id/nett_profit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/current_stock_value"
+                android:layout_marginTop="8dp"
+                android:text="1298.48" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/nett_profit"
+                android:layout_marginTop="8dp"
+                android:text="Potential profit" />
+
+            <TextView
+                android:id="@+id/potential_profit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/nett_profit"
+                android:layout_marginTop="8dp"
+                android:text="0.00" />-->
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/current_stock_value"
+                android:layout_marginTop="8dp"
+                android:text="Target total profit" />
+
+            <TextView
+                android:id="@+id/target_total_profit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/current_stock_value"
+                android:layout_marginTop="8dp"
+                android:text="949.42" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/target_total_profit"
+                android:layout_marginTop="8dp"
+                android:text="Reward" />
+
+            <TextView
+                android:id="@+id/reward"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/target_total_profit"
+                android:layout_marginTop="8dp"
+                android:text="894.88" />
+        </RelativeLayout>
+    </LinearLayout>
+</android.support.v7.widget.CardView>

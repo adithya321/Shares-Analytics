@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Shares Analysis</string>
+
+    <string name="activity_hello_headline">Hello.</string>
+    <string name="activity_hello_subheading">We just need a few quick things before getting you started.</string>
+    <string name="activity_hello_name">Name</string>
+    <string name="activity_hello_target">Target % p.a.</string>
+    <string name="activity_hello_bank_ROI">Bank rate of interest</string>
+    <string name="activity_hello_hint_settings">You can change these in settings later.</string>
+    <string name="activity_hello_button_start">GET STARTED</string>
+</resources>
