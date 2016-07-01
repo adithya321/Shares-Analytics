@@ -24,6 +24,7 @@ import com.adithya321.sharesanalysis.database.Purchase;
 import com.adithya321.sharesanalysis.database.Share;
 import com.adithya321.sharesanalysis.recyclerviewdrag.OnStartDragListener;
 import com.adithya321.sharesanalysis.recyclerviewdrag.SimpleItemTouchHelperCallback;
+import com.adithya321.sharesanalysis.utils.StringUtils;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -117,13 +118,7 @@ public class ShareHoldingsFragment extends Fragment implements OnStartDragListen
             try {
                 for (int i = 0; i < shares.size(); i++) {
                     Share share = shares.get(i);
-                    String name = share.getName();
-                    String code = "";
-                    int j = 0;
-                    while (name.charAt(j) != ' ') {
-                        code += name.charAt(j);
-                        j++;
-                    }
+                    String code = StringUtils.getCode(share.getName());
                     String url = "https://in.finance.yahoo.com/q?s=" + code + ".NS";
                     Document document = Jsoup.connect(url).followRedirects(true).get();
                     try {

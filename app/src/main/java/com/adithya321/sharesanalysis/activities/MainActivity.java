@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -34,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
     private SharedPreferences sharedPreferences;
     private Drawer drawer;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         AccountHeader accountHeader = new AccountHeaderBuilder()
@@ -74,6 +74,8 @@ public class MainActivity extends AppCompatActivity {
                 .withAccountHeader(accountHeader)
                 .withActionBarDrawerToggleAnimated(true)
                 .addDrawerItems(
+                        new PrimaryDrawerItem().withIdentifier(0).withName("Dashboard"),
+                        new DividerDrawerItem(),
                         new PrimaryDrawerItem().withIdentifier(1).withName("Fund Flow"),
                         new PrimaryDrawerItem().withIdentifier(2).withName("Share Purchase"),
                         new PrimaryDrawerItem().withIdentifier(3).withName("Share Sales"),
@@ -95,6 +97,10 @@ public class MainActivity extends AppCompatActivity {
                         if (drawerItem != null) {
                             flag = true;
                             switch ((int) drawerItem.getIdentifier()) {
+                                case 0:
+                                    switchFragment("Dashboard", "Dashboard");
+                                    break;
+
                                 case 10:
                                     final RealmBackupRestore backupRestore = new RealmBackupRestore(MainActivity.this);
                                     new AlertDialog.Builder(MainActivity.this)
@@ -169,11 +175,8 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .build();
 
-        if (savedInstanceState == null) {
-            drawer.setSelection(1);
-        } else {
-            drawer.setSelection(savedInstanceState.getInt("drawerSelection"));
-        }
+        if (savedInstanceState == null) drawer.setSelection(0);
+        else drawer.setSelection(savedInstanceState.getLong("drawerSelection"), true);
 
         CustomActivityOnCrash.install(this);
     }
@@ -202,8 +205,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        outState.putInt("drawerSelection", drawer.getCurrentSelectedPosition());
-        super.onSaveInstanceState(outState, outPersistentState);
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putLong("drawerSelection", drawer.getCurrentSelection());
+        super.onSaveInstanceState(outState);
+    }
+
+    public void openDetail(View view) {
+        startActivity(new Intent(MainActivity.this, DetailActivity.class));
     }
 }

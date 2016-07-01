@@ -12,8 +12,8 @@ apply plugin: 'realm-android'
 apply plugin: 'jacoco-android'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    compileSdkVersion 24
+    buildToolsVersion "24.0.0"
 
     lintOptions {
         abortOnError false
@@ -22,9 +22,9 @@ android {
     defaultConfig {
         applicationId "com.adithya321.sharesanalysis"
         minSdkVersion 16
-        targetSdkVersion 23
-        versionCode 10
-        versionName "0.11"
+        targetSdkVersion 24
+        versionCode 11
+        versionName "0.12"
 
         vectorDrawables.useSupportLibrary = true
     }
@@ -41,10 +41,7 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
 
-    compile 'com.android.support:appcompat-v7:23.4.0'
-    compile 'com.android.support:design:23.4.0'
-    compile 'com.android.support:cardview-v7:23.4.0'
-    compile 'com.android.support:recyclerview-v7:23.4.0'
+    compile 'com.android.support:support-v13:24.0.0'
 
     compile('com.mikepenz:aboutlibraries:5.6.8@aar') {
         transitive = true
@@ -55,7 +52,9 @@ dependencies {
         transitive = true
     }
     compile 'org.jsoup:jsoup:1.9.2'
+    compile 'com.robinhood.spark:spark:1.1.1'
 
+    //Smooch
     compile 'com.google.android.gms:play-services-gcm:9.2.0'
     compile 'com.google.code.gson:gson:2.4'
     compile 'com.squareup.okhttp:okhttp:2.4.0'

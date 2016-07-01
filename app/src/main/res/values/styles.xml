@@ -4,5 +4,20 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="spark_SparkViewStyle">@style/MySparkViewStyle</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="MySparkViewStyle" parent="@style/spark_SparkView">
+        <item name="spark_lineColor">@color/colorPrimary</item>
+        <item name="spark_fill">false</item>
+        <item name="spark_baseLineColor">@color/colorAccent</item>
+        <item name="spark_scrubLineColor">@color/colorAccent</item>
+        <item name="spark_scrubEnabled">true</item>
+        <item name="spark_animateChanges">true</item>
     </style>
 </resources>

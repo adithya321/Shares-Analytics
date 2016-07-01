@@ -8,4 +8,8 @@
     <string name="activity_hello_bank_ROI">Bank rate of interest</string>
     <string name="activity_hello_hint_settings">You can change these in settings later.</string>
     <string name="activity_hello_button_start">GET STARTED</string>
+
+    <string name="title_activity_detail">DetailActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$s</string>
 </resources>
