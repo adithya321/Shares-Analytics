@@ -6,16 +6,9 @@ import com.robinhood.spark.SparkAdapter;
 
 public class SparkViewAdapter extends SparkAdapter {
     private final float[] yData;
-    int i = 0;
 
-    public SparkViewAdapter() {
-        yData = new float[10];
-    }
-
-    public void add(Float y) {
-        yData[i] = y;
-        i = (i < 9) ? i + 1 : 0;
-        notifyDataSetChanged();
+    public SparkViewAdapter(float[] yData) {
+        this.yData = yData;
     }
 
     @Override

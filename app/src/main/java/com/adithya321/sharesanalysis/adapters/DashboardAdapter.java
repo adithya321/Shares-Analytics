@@ -15,7 +15,6 @@ import com.adithya321.sharesanalysis.recyclerviewdrag.ItemTouchHelperAdapter;
 import com.adithya321.sharesanalysis.recyclerviewdrag.ItemTouchHelperViewHolder;
 import com.adithya321.sharesanalysis.utils.NumberUtils;
 import com.adithya321.sharesanalysis.utils.StringUtils;
-import com.robinhood.spark.SparkView;
 
 import java.util.Collections;
 import java.util.List;
@@ -39,17 +38,17 @@ public class DashboardAdapter extends RecyclerView.Adapter<DashboardAdapter.View
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
         public final TextView name;
-        public final SparkView mSparkView;
         public final TextView currentShareValue;
+        public final TextView currentnoOfShares;
+        public final TextView shareChange;
 
         public ViewHolder(final View view) {
             super(view);
 
             name = (TextView) view.findViewById(R.id.dashboard_share_name);
-            mSparkView = (SparkView) view.findViewById(R.id.dashboard_spark_view);
             currentShareValue = (TextView) view.findViewById(R.id.dashboard_share_price);
-
-            mSparkView.setScrubEnabled(false);
+            currentnoOfShares = (TextView) view.findViewById(R.id.dashboard_current_no_of_shares);
+            shareChange = (TextView) view.findViewById(R.id.dashboard_share_change);
 
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -92,15 +91,8 @@ public class DashboardAdapter extends RecyclerView.Adapter<DashboardAdapter.View
     public void onBindViewHolder(DashboardAdapter.ViewHolder viewHolder, int position) {
         Share share = mShares.get(position);
         viewHolder.name.setText(StringUtils.getCode(share.getName()));
-
-        SparkViewAdapter mSparkViewAdapter = new SparkViewAdapter();
-        if (viewHolder.mSparkView.getAdapter() != null) {
-            mSparkViewAdapter = (SparkViewAdapter) viewHolder.mSparkView.getAdapter();
-        }
-        mSparkViewAdapter.add((float) share.getCurrentShareValue());
-        viewHolder.mSparkView.setAdapter(mSparkViewAdapter);
-
         viewHolder.currentShareValue.setText(String.valueOf(NumberUtils.round(share.getCurrentShareValue(), 2)));
+
     }
 
     @Override

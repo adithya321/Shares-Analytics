@@ -1,9 +1,9 @@
 package com.adithya321.sharesanalysis.fragments;
 
-import android.app.ActivityOptions;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -23,7 +23,6 @@ import com.adithya321.sharesanalysis.database.DatabaseHandler;
 import com.adithya321.sharesanalysis.database.Share;
 import com.adithya321.sharesanalysis.recyclerviewdrag.SimpleItemTouchHelperCallback;
 import com.adithya321.sharesanalysis.utils.StringUtils;
-import com.robinhood.spark.SparkView;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -48,7 +47,7 @@ public class DashboardFragment extends Fragment {
 
         databaseHandler = new DatabaseHandler(getContext());
         sharesRecyclerView = (RecyclerView) root.findViewById(R.id.shares_recycler_view);
-        mSparkViewAdapter = new SparkViewAdapter();
+        mSparkViewAdapter = new SparkViewAdapter(new float[]{});
         setRecyclerViewAdapter();
 
         return root;
@@ -60,20 +59,9 @@ public class DashboardFragment extends Fragment {
         mDashboardAdapter.setOnItemClickListener(new DashboardAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
-                SparkView sparkView = (SparkView) itemView.findViewById(R.id.dashboard_spark_view);
                 Intent intent = new Intent(getContext(), DetailActivity.class);
                 intent.putExtra("pos", position);
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    String transitionName = "spark_view_transition";
-
-                    ActivityOptions transitionActivityOptions = ActivityOptions
-                            .makeSceneTransitionAnimation(getActivity(), sparkView, transitionName);
-                    startActivity(intent, transitionActivityOptions.toBundle());
-                } else {
-                    startActivity(intent);
-                    getActivity().overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.fade_out);
-                }
+                startActivity(intent);
             }
         });
         sharesRecyclerView.setAdapter(mDashboardAdapter);
@@ -86,7 +74,8 @@ public class DashboardFragment extends Fragment {
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(sharesRecyclerView);
 
-        //new CurrentShareValue().execute();
+        if (isNetworkConnected())
+            new CurrentShareValue().execute();
     }
 
     private class CurrentShareValue extends AsyncTask<Void, Void, Void> {
@@ -107,6 +96,7 @@ public class DashboardFragment extends Fragment {
                     try {
                         currentShareValue = document.getElementById("yfs_l84_" + code.toLowerCase()
                                 + ".ns").html();
+                        Log.e("CSV", currentShareValue + ":" + code);
                         Realm realm = db.getRealmInstance();
                         realm.beginTransaction();
                         share.setCurrentShareValue(Double.parseDouble(currentShareValue));
@@ -126,7 +116,11 @@ public class DashboardFragment extends Fragment {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             mDashboardAdapter.notifyDataSetChanged();
-            new CurrentShareValue().execute();
         }
+    }
+
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        return cm.getActiveNetworkInfo() != null;
     }
 }

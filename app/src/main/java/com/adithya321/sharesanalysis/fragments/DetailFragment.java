@@ -16,7 +16,6 @@ import com.adithya321.sharesanalysis.utils.StringUtils;
 import com.robinhood.spark.SparkView;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -54,6 +53,8 @@ public class DetailFragment extends Fragment {
         final TextView quantity = (TextView) rootView.findViewById(R.id.detail_quantity);
         final TextView turnover = (TextView) rootView.findViewById(R.id.detail_turnover);
 
+        final SparkView sparkView = (SparkView) rootView.findViewById(R.id.detail_spark_view);
+
         databaseHandler = new DatabaseHandler(getActivity());
         List<Share> shares = databaseHandler.getShares();
         Share share = new Share();
@@ -68,7 +69,6 @@ public class DetailFragment extends Fragment {
         String url = BASE_URL.concat(StringUtils.getCode(share.getName()) + ".json");
         HttpUrl.Builder urlBuilder = HttpUrl.parse(url).newBuilder();
         urlBuilder.addQueryParameter("api_key", getString(R.string.quandl_api_key));
-        urlBuilder.addQueryParameter("start_date", "2016-06-26");
         url = urlBuilder.build().toString();
 
         OkHttpClient client = new OkHttpClient();
@@ -83,25 +83,37 @@ public class DetailFragment extends Fragment {
                     String responseData = response.body().string();
                     JSONObject j = new JSONObject(responseData);
                     j = j.getJSONObject("dataset");
-                    final JSONArray jsonArray = j.getJSONArray("data").getJSONArray(0);
+                    final JSONArray jsonArray = j.getJSONArray("data");
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             try {
-                                date.setText(jsonArray.get(0).toString());
-                                open.setText(jsonArray.get(1).toString());
-                                high.setText(jsonArray.get(2).toString());
-                                low.setText(jsonArray.get(3).toString());
-                                last.setText(jsonArray.get(4).toString());
-                                close.setText(jsonArray.get(5).toString());
-                                quantity.setText(jsonArray.get(6).toString());
-                                turnover.setText(jsonArray.get(7).toString());
-                            }catch (Exception e){
+                                float[] yData = new float[jsonArray.length()];
+                                int j = jsonArray.length() - 1;
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    try {
+                                        yData[j] = Float.parseFloat(jsonArray.getJSONArray(i).get(5).toString());
+                                    } catch (Exception e) {
+                                        //
+                                    }
+                                    j--;
+                                }
+                                sparkView.setAdapter(new SparkViewAdapter(yData));
+
+                                date.setText(jsonArray.getJSONArray(0).get(0).toString());
+                                open.setText(jsonArray.getJSONArray(0).get(1).toString());
+                                high.setText(jsonArray.getJSONArray(0).get(2).toString());
+                                low.setText(jsonArray.getJSONArray(0).get(3).toString());
+                                last.setText(jsonArray.getJSONArray(0).get(4).toString());
+                                close.setText(jsonArray.getJSONArray(0).get(5).toString());
+                                quantity.setText(jsonArray.getJSONArray(0).get(6).toString());
+                                turnover.setText(jsonArray.getJSONArray(0).get(7).toString());
+                            } catch (Exception e) {
                                 Log.e("UI Json", e.toString());
                             }
                         }
                     });
-                } catch (JSONException e) {
+                } catch (Exception e) {
                     Log.e("DetailFragment Json", e.toString());
                 }
             }
@@ -111,11 +123,6 @@ public class DetailFragment extends Fragment {
                 Log.e("DetailFragment onFail", e.toString());
             }
         });
-
-        SparkView sparkView = (SparkView) rootView.findViewById(R.id.detail_spark_view);
-        SparkViewAdapter sparkViewAdapter = new SparkViewAdapter();
-        sparkViewAdapter.add((float) share.getCurrentShareValue());
-        sparkView.setAdapter(sparkViewAdapter);
 
         return rootView;
     }

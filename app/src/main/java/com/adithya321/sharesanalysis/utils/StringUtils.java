@@ -10,4 +10,17 @@ public class StringUtils {
         }
         return code;
     }
+
+    public static String getName(String string) {
+        String name = "";
+        int j = 0;
+        while (j < string.length() && string.charAt(j) != '-') j++;
+        j++;
+        while (j < string.length()) {
+            name += string.charAt(j);
+            j++;
+        }
+        if (name.length() == 0) return string;
+        else return name;
+    }
 }
