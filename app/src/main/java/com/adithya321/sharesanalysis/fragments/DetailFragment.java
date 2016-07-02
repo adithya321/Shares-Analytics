@@ -1,6 +1,7 @@
 package com.adithya321.sharesanalysis.fragments;
 
 import android.app.Fragment;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,7 +12,10 @@ import android.widget.TextView;
 import com.adithya321.sharesanalysis.R;
 import com.adithya321.sharesanalysis.adapters.SparkViewAdapter;
 import com.adithya321.sharesanalysis.database.DatabaseHandler;
+import com.adithya321.sharesanalysis.database.Purchase;
 import com.adithya321.sharesanalysis.database.Share;
+import com.adithya321.sharesanalysis.utils.DateUtils;
+import com.adithya321.sharesanalysis.utils.NumberUtils;
 import com.adithya321.sharesanalysis.utils.StringUtils;
 import com.robinhood.spark.SparkView;
 
@@ -19,8 +23,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import io.realm.RealmList;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
@@ -28,9 +36,13 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import static com.adithya321.sharesanalysis.R.id.detail_difference;
+import static com.adithya321.sharesanalysis.R.id.detail_reward;
+
 public class DetailFragment extends Fragment {
     private static final String ARG_SHARE_NAME = "share_name";
     private DatabaseHandler databaseHandler;
+    private Share share;
 
     public DetailFragment newInstance(String shareName) {
         DetailFragment fragment = new DetailFragment();
@@ -57,7 +69,7 @@ public class DetailFragment extends Fragment {
 
         databaseHandler = new DatabaseHandler(getActivity());
         List<Share> shares = databaseHandler.getShares();
-        Share share = new Share();
+        share = new Share();
         for (Share s : shares) {
             if (s.getName().equals(getArguments().getString(ARG_SHARE_NAME))) {
                 share = s;
@@ -124,6 +136,144 @@ public class DetailFragment extends Fragment {
             }
         });
 
+        setSharePurchases(rootView);
+        setShareSales(rootView);
+        setShareHoldings(rootView);
+
         return rootView;
+    }
+
+    private void setSharePurchases(View view) {
+        TextView totalSharesPurchasedTV = (TextView) view.findViewById(R.id.detail_total_shares_purchased);
+        TextView totalValueTV = (TextView) view.findViewById(R.id.detail_total_purchased_value);
+        TextView averageShareValueTV = (TextView) view.findViewById(R.id.detail_average_value);
+        TextView dateOfInitialPurchaseTV = (TextView) view.findViewById(R.id.detail_date_of_purchase);
+
+        int totalSharesPurchased = 0;
+        double totalValue = 0;
+        double averageShareValue = 0;
+
+        RealmList<Purchase> purchases = share.getPurchases();
+        for (Purchase purchase : purchases) {
+            if (purchase.getType().equals("buy")) {
+                totalSharesPurchased += purchase.getQuantity();
+                totalValue += (purchase.getQuantity() * purchase.getPrice());
+            }
+        }
+        if (totalSharesPurchased != 0)
+            averageShareValue = totalValue / totalSharesPurchased;
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(share.getDateOfInitialPurchase());
+        String date = calendar.get(Calendar.DAY_OF_MONTH) + "/" + (calendar.get(Calendar.MONTH) + 1)
+                + "/" + calendar.get(Calendar.YEAR);
+
+        totalSharesPurchasedTV.setText(String.valueOf(totalSharesPurchased));
+        totalValueTV.setText(String.valueOf(NumberUtils.round(totalValue, 2)));
+        averageShareValueTV.setText(String.valueOf(NumberUtils.round(averageShareValue, 2)));
+        dateOfInitialPurchaseTV.setText(date);
+    }
+
+    private void setShareSales(View view) {
+        TextView totalSharesPurchasedTV = (TextView) view.findViewById(R.id.detail_total_shares_sold);
+        TextView totalValueTV = (TextView) view.findViewById(R.id.detail_total_value_sold);
+        TextView targetSalePriceTV = (TextView) view.findViewById(R.id.detail_target);
+        TextView differenceTV = (TextView) view.findViewById(detail_difference);
+
+        int totalSharesSold = 0;
+        int totalSharesPurchased = 0;
+        double totalValueSold = 0;
+        double totalValuePurchased = 0;
+        double averageShareValue = 0;
+        double targetSalePrice = 0;
+        double difference = 0;
+
+        RealmList<Purchase> purchases = share.getPurchases();
+        for (Purchase purchase : purchases) {
+            if (purchase.getType().equals("sell")) {
+                totalSharesSold += purchase.getQuantity();
+                totalValueSold += (purchase.getQuantity() * purchase.getPrice());
+            } else if (purchase.getType().equals("buy")) {
+                totalSharesPurchased += purchase.getQuantity();
+                totalValuePurchased += (purchase.getQuantity() * purchase.getPrice());
+            }
+        }
+        if (totalSharesPurchased != 0)
+            averageShareValue = totalValuePurchased / totalSharesPurchased;
+
+        Date today = new Date();
+        Date start = share.getDateOfInitialPurchase();
+        long noOfDays = DateUtils.getDateDiff(start, today, TimeUnit.DAYS);
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("prefs", 0);
+        double target = sharedPreferences.getFloat("target", 0);
+        targetSalePrice = averageShareValue * Math.pow((1 + (target / 100)), ((double) noOfDays / 365));
+        difference = share.getCurrentShareValue() - targetSalePrice;
+        if (difference < 0)
+            differenceTV.setTextColor(getResources().getColor((android.R.color.holo_red_dark)));
+        else differenceTV.setTextColor(getResources().getColor((R.color.colorPrimary)));
+
+        totalSharesPurchasedTV.setText(String.valueOf(totalSharesSold));
+        totalValueTV.setText(String.valueOf(NumberUtils.round(totalValueSold, 2)));
+        targetSalePriceTV.setText(String.valueOf(NumberUtils.round(targetSalePrice, 2)));
+        differenceTV.setText(String.valueOf(NumberUtils.round(difference, 2)));
+    }
+
+    private void setShareHoldings(View view) {
+        TextView percentageChangeTV = (TextView) view.findViewById(R.id.detail__percent_change);
+        TextView noOfDaysTV = (TextView) view.findViewById(R.id.detail_no_of_days);
+        TextView totalProfitTV = (TextView) view.findViewById(R.id.detail_total_profit);
+        TextView currentNoOfSharesTV = (TextView) view.findViewById(R.id.detail_currents_no_of_shares);
+        TextView currentStockValueTV = (TextView) view.findViewById(R.id.detail_current_value);
+        TextView targetTotalProfitTV = (TextView) view.findViewById(R.id.detail_target_total_profit);
+        TextView rewardTV = (TextView) view.findViewById(detail_reward);
+
+        int totalSharesPurchased = 0;
+        int totalSharesSold = 0;
+        double totalValuePurchased = 0;
+        double totalValueSold = 0;
+        double averageShareValue = 0;
+        double percentageChange = 0;
+        double totalProfit = 0;
+        double targetTotalProfit = 0;
+        double reward = 0;
+        double currentStockValue = 0;
+
+        RealmList<Purchase> purchases = share.getPurchases();
+        for (Purchase purchase : purchases) {
+            if (purchase.getType().equals("buy")) {
+                totalSharesPurchased += purchase.getQuantity();
+                totalValuePurchased += (purchase.getQuantity() * purchase.getPrice());
+            } else if (purchase.getType().equals("sell")) {
+                totalSharesSold += purchase.getQuantity();
+                totalValueSold += (purchase.getQuantity() * purchase.getPrice());
+            }
+        }
+        if (totalSharesPurchased != 0)
+            averageShareValue = totalValuePurchased / totalSharesPurchased;
+
+        percentageChange = ((share.getCurrentShareValue() - averageShareValue) / averageShareValue) * 100;
+        Date today = new Date();
+        Date start = share.getDateOfInitialPurchase();
+        long noOfDays = DateUtils.getDateDiff(start, today, TimeUnit.DAYS);
+
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("prefs", 0);
+
+        int currentNoOfShares = totalSharesPurchased - totalSharesSold;
+        totalProfit = totalValueSold - totalValuePurchased;
+        currentStockValue = currentNoOfShares * share.getCurrentShareValue();
+        double target = sharedPreferences.getFloat("target", 0);
+        targetTotalProfit = (target / 100) * totalValuePurchased * ((double) noOfDays / 365);
+        reward = totalProfit - targetTotalProfit;
+        if (reward < 0)
+            rewardTV.setTextColor(getResources().getColor((android.R.color.holo_red_dark)));
+        else rewardTV.setTextColor(getResources().getColor((R.color.colorPrimary)));
+
+        currentNoOfSharesTV.setText(String.valueOf(currentNoOfShares));
+        percentageChangeTV.setText(String.valueOf(NumberUtils.round(percentageChange, 2)));
+        noOfDaysTV.setText(String.valueOf(noOfDays));
+        totalProfitTV.setText(String.valueOf(NumberUtils.round(totalProfit, 2)));
+        currentStockValueTV.setText(String.valueOf(NumberUtils.round(currentStockValue, 2)));
+        targetTotalProfitTV.setText(String.valueOf(NumberUtils.round(targetTotalProfit, 2)));
+        rewardTV.setText(String.valueOf(NumberUtils.round(reward, 2)));
     }
 }
