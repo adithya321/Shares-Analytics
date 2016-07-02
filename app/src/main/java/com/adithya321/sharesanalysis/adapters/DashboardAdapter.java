@@ -46,8 +46,10 @@ public class DashboardAdapter extends RecyclerView.Adapter<DashboardAdapter.View
             super(view);
 
             name = (TextView) view.findViewById(R.id.dashboard_share_name);
-            mSparkView = (SparkView) view.findViewById(R.id.spark_view);
+            mSparkView = (SparkView) view.findViewById(R.id.dashboard_spark_view);
             currentShareValue = (TextView) view.findViewById(R.id.dashboard_share_price);
+
+            mSparkView.setScrubEnabled(false);
 
             view.setOnClickListener(new View.OnClickListener() {
                 @Override

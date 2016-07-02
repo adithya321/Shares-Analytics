@@ -23,8 +23,8 @@ android {
         applicationId "com.adithya321.sharesanalysis"
         minSdkVersion 16
         targetSdkVersion 24
-        versionCode 11
-        versionName "0.12"
+        versionCode 14
+        versionName "0.14"
 
         vectorDrawables.useSupportLibrary = true
     }
@@ -57,7 +57,7 @@ dependencies {
     //Smooch
     compile 'com.google.android.gms:play-services-gcm:9.2.0'
     compile 'com.google.code.gson:gson:2.4'
-    compile 'com.squareup.okhttp:okhttp:2.4.0'
+    compile 'com.squareup.okhttp3:okhttp:3.3.1'
     compile 'io.smooch:core:latest.release'
     compile 'io.smooch:ui:latest.release'
 }

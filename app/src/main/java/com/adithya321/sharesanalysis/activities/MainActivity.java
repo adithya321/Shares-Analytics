@@ -206,11 +206,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putLong("drawerSelection", drawer.getCurrentSelection());
+        if (drawer != null)
+            outState.putLong("drawerSelection", drawer.getCurrentSelection());
         super.onSaveInstanceState(outState);
-    }
-
-    public void openDetail(View view) {
-        startActivity(new Intent(MainActivity.this, DetailActivity.class));
     }
 }

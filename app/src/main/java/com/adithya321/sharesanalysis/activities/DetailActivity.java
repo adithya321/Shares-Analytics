@@ -54,6 +54,8 @@ public class DetailActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
         tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
+        TabLayout.Tab tab = tabLayout.getTabAt(getIntent().getIntExtra("pos", 0));
+        tab.select();
     }
 
 
@@ -71,5 +73,11 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.slide_out_right);
     }
 }

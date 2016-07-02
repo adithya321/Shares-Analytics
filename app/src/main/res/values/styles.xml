@@ -18,6 +18,6 @@
         <item name="spark_baseLineColor">@color/colorAccent</item>
         <item name="spark_scrubLineColor">@color/colorAccent</item>
         <item name="spark_scrubEnabled">true</item>
-        <item name="spark_animateChanges">true</item>
+        <item name="spark_animateChanges">false</item>
     </style>
 </resources>

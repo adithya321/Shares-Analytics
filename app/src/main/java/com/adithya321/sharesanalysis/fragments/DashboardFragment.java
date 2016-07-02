@@ -1,8 +1,10 @@
 package com.adithya321.sharesanalysis.fragments;
 
+import android.app.ActivityOptions;
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,12 +16,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.adithya321.sharesanalysis.R;
+import com.adithya321.sharesanalysis.activities.DetailActivity;
 import com.adithya321.sharesanalysis.adapters.DashboardAdapter;
 import com.adithya321.sharesanalysis.adapters.SparkViewAdapter;
 import com.adithya321.sharesanalysis.database.DatabaseHandler;
 import com.adithya321.sharesanalysis.database.Share;
 import com.adithya321.sharesanalysis.recyclerviewdrag.SimpleItemTouchHelperCallback;
 import com.adithya321.sharesanalysis.utils.StringUtils;
+import com.robinhood.spark.SparkView;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -56,7 +60,20 @@ public class DashboardFragment extends Fragment {
         mDashboardAdapter.setOnItemClickListener(new DashboardAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
+                SparkView sparkView = (SparkView) itemView.findViewById(R.id.dashboard_spark_view);
+                Intent intent = new Intent(getContext(), DetailActivity.class);
+                intent.putExtra("pos", position);
 
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    String transitionName = "spark_view_transition";
+
+                    ActivityOptions transitionActivityOptions = ActivityOptions
+                            .makeSceneTransitionAnimation(getActivity(), sparkView, transitionName);
+                    startActivity(intent, transitionActivityOptions.toBundle());
+                } else {
+                    startActivity(intent);
+                    getActivity().overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.fade_out);
+                }
             }
         });
         sharesRecyclerView.setAdapter(mDashboardAdapter);
@@ -69,8 +86,7 @@ public class DashboardFragment extends Fragment {
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(sharesRecyclerView);
 
-        final Handler handler = new Handler();
-        new CurrentShareValue().execute();
+        //new CurrentShareValue().execute();
     }
 
     private class CurrentShareValue extends AsyncTask<Void, Void, Void> {

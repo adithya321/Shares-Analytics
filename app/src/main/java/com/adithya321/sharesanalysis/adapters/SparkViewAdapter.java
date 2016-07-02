@@ -14,7 +14,7 @@ public class SparkViewAdapter extends SparkAdapter {
 
     public void add(Float y) {
         yData[i] = y;
-        i = (i < 10) ? i + 1 : 0;
+        i = (i < 9) ? i + 1 : 0;
         notifyDataSetChanged();
     }
 
