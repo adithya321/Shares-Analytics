@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.adithya321.sharesanalysis.R;
 import com.adithya321.sharesanalysis.database.DatabaseHandler;
+import com.adithya321.sharesanalysis.database.Purchase;
 import com.adithya321.sharesanalysis.database.Share;
 import com.adithya321.sharesanalysis.recyclerviewdrag.ItemTouchHelperAdapter;
 import com.adithya321.sharesanalysis.recyclerviewdrag.ItemTouchHelperViewHolder;
@@ -20,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 import io.realm.Realm;
+import io.realm.RealmList;
 
 public class DashboardAdapter extends RecyclerView.Adapter<DashboardAdapter.ViewHolder>
         implements ItemTouchHelperAdapter {
@@ -93,6 +95,32 @@ public class DashboardAdapter extends RecyclerView.Adapter<DashboardAdapter.View
         viewHolder.name.setText(StringUtils.getCode(share.getName()));
         viewHolder.currentShareValue.setText(String.valueOf(NumberUtils.round(share.getCurrentShareValue(), 2)));
 
+        int totalSharesPurchased = 0;
+        int totalSharesSold = 0;
+        double totalValue = 0;
+        int currentNoOfShares = 0;
+        double averageShareValue = 0;
+
+        RealmList<Purchase> purchases = share.getPurchases();
+        for (Purchase purchase : purchases) {
+            if (purchase.getType().equals("buy")) {
+                totalSharesPurchased += purchase.getQuantity();
+                totalValue += (purchase.getQuantity() * purchase.getPrice());
+            } else if (purchase.getType().equals("sell")) {
+                totalSharesSold += purchase.getQuantity();
+            }
+        }
+        if (totalSharesPurchased != 0)
+            averageShareValue = totalValue / totalSharesPurchased;
+
+        Double percentChange = (share.getCurrentShareValue() - averageShareValue) / averageShareValue * 100;
+        currentNoOfShares = totalSharesPurchased - totalSharesSold;
+        viewHolder.currentnoOfShares.setText(currentNoOfShares + " shares");
+        viewHolder.shareChange.setText(NumberUtils.round(percentChange, 2) + "%");
+        if (percentChange < 0)
+            viewHolder.shareChange.setTextColor(getContext().getResources().getColor((android.R.color.holo_red_dark)));
+        else
+            viewHolder.shareChange.setTextColor(getContext().getResources().getColor((R.color.colorPrimary)));
     }
 
     @Override

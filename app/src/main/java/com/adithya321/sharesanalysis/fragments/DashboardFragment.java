@@ -18,7 +18,6 @@ import android.view.ViewGroup;
 import com.adithya321.sharesanalysis.R;
 import com.adithya321.sharesanalysis.activities.DetailActivity;
 import com.adithya321.sharesanalysis.adapters.DashboardAdapter;
-import com.adithya321.sharesanalysis.adapters.SparkViewAdapter;
 import com.adithya321.sharesanalysis.database.DatabaseHandler;
 import com.adithya321.sharesanalysis.database.Share;
 import com.adithya321.sharesanalysis.recyclerviewdrag.SimpleItemTouchHelperCallback;
@@ -38,7 +37,6 @@ public class DashboardFragment extends Fragment {
     private DashboardAdapter mDashboardAdapter;
     private RecyclerView sharesRecyclerView;
     private ItemTouchHelper mItemTouchHelper;
-    private SparkViewAdapter mSparkViewAdapter;
 
     @Nullable
     @Override
@@ -47,7 +45,6 @@ public class DashboardFragment extends Fragment {
 
         databaseHandler = new DatabaseHandler(getContext());
         sharesRecyclerView = (RecyclerView) root.findViewById(R.id.shares_recycler_view);
-        mSparkViewAdapter = new SparkViewAdapter(new float[]{});
         setRecyclerViewAdapter();
 
         return root;

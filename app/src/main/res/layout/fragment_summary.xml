@@ -5,9 +5,26 @@
     android:orientation="vertical">
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="COMING SOON"
-        android:textSize="64dp" />
+        android:text="Investments" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="My Net Worth" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Potential Profit" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Target Profit" />
 </LinearLayout>

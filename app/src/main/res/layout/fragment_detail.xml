@@ -98,7 +98,6 @@
                         android:id="@+id/detail_current_value"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
                         android:text="38800"
                         android:textAppearance="?android:textAppearanceLarge" />
 
@@ -111,6 +110,7 @@
                         android:id="@+id/detail__percent_change"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
                         android:text="31.38"
                         android:textAppearance="?android:textAppearanceLarge" />
 
@@ -307,15 +307,13 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:gravity="center"
-            android:text="$186.31"
             android:textAppearance="?android:textAppearanceLarge" />
 
         <TextView
             android:id="@+id/time"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="04:00 PM" />
+            android:gravity="center" />
 
         <com.robinhood.spark.SparkView
             android:id="@+id/detail_spark_view"
