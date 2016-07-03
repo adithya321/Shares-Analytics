@@ -3,19 +3,21 @@ package com.adithya321.sharesanalysis.activities;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import com.adithya321.sharesanalysis.R;
 import com.adithya321.sharesanalysis.backup.RealmBackupRestore;
+import com.mikepenz.aboutlibraries.Libs;
 import com.mikepenz.aboutlibraries.LibsBuilder;
+import com.mikepenz.aboutlibraries.LibsConfiguration;
+import com.mikepenz.aboutlibraries.entity.Library;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -34,6 +36,67 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     private Drawer drawer;
     private Toolbar toolbar;
+    private LibsConfiguration.LibsListener libsListener = new LibsConfiguration.LibsListener() {
+        @Override
+        public void onIconClicked(View v) {
+            Intent github = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/adithya321/Shares-Analytics"));
+            startActivity(github);
+        }
+
+        @Override
+        public boolean onLibraryAuthorClicked(View v, Library library) {
+            return false;
+        }
+
+        @Override
+        public boolean onLibraryContentClicked(View v, Library library) {
+            return false;
+        }
+
+        @Override
+        public boolean onLibraryBottomClicked(View v, Library library) {
+            return false;
+        }
+
+        @Override
+        public boolean onExtraClicked(View v, Libs.SpecialButton specialButton) {
+            switch (v.getId()) {
+                case R.id.aboutSpecial1:
+                    String MARKET_URL = "https://play.google.com/store/apps/details?id=";
+                    String PlayStoreListing = getPackageName();
+                    Intent rate = new Intent(Intent.ACTION_VIEW, Uri.parse(MARKET_URL + PlayStoreListing));
+                    startActivity(rate);
+                    return true;
+
+                case R.id.aboutSpecial2:
+                    String PlayStoreDevAccount = "https://play.google.com/store/apps/developer?id=P.I.M.P.";
+                    Intent devPlay = new Intent(Intent.ACTION_VIEW, Uri.parse(PlayStoreDevAccount));
+                    startActivity(devPlay);
+                    return true;
+            }
+            return false;
+        }
+
+        @Override
+        public boolean onIconLongClicked(View v) {
+            return false;
+        }
+
+        @Override
+        public boolean onLibraryAuthorLongClicked(View v, Library library) {
+            return false;
+        }
+
+        @Override
+        public boolean onLibraryContentLongClicked(View v, Library library) {
+            return false;
+        }
+
+        @Override
+        public boolean onLibraryBottomLongClicked(View v, Library library) {
+            return false;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,18 +137,27 @@ public class MainActivity extends AppCompatActivity {
                 .withAccountHeader(accountHeader)
                 .withActionBarDrawerToggleAnimated(true)
                 .addDrawerItems(
-                        new PrimaryDrawerItem().withIdentifier(0).withName("Dashboard"),
+                        new PrimaryDrawerItem().withIdentifier(0).withName("Dashboard").withIcon(R.drawable.ic_timeline_gray),
+                        new PrimaryDrawerItem().withIdentifier(1).withName("Fund Flow").withIcon(R.drawable.ic_compare_arrows_gray),
                         new DividerDrawerItem(),
-                        new PrimaryDrawerItem().withIdentifier(1).withName("Fund Flow"),
-                        new PrimaryDrawerItem().withIdentifier(2).withName("Share Purchase"),
-                        new PrimaryDrawerItem().withIdentifier(3).withName("Share Sales"),
-                        new PrimaryDrawerItem().withIdentifier(4).withName("Share Holdings"),
+                        new PrimaryDrawerItem().withIdentifier(2).withName("Share Purchase")
+                                .withIcon(R.drawable.ic_add_green)
+                                .withTextColor(getResources().getColor(R.color.colorPrimary)),
+                        new PrimaryDrawerItem().withIdentifier(3).withName("Share Sales")
+                                .withIcon(R.drawable.ic_remove_red)
+                                .withTextColor(getResources().getColor(android.R.color.holo_red_dark)),
+                        new PrimaryDrawerItem().withIdentifier(4).withName("Share Holdings")
+                                .withIcon(R.drawable.ic_account_balance_blue)
+                                .withTextColor(getResources().getColor(R.color.colorAccent)),
                         new DividerDrawerItem(),
-                        new PrimaryDrawerItem().withIdentifier(5).withName("Charts"),
-                        new PrimaryDrawerItem().withIdentifier(6).withName("Summary"),
+                        new PrimaryDrawerItem().withIdentifier(5).withName("Charts").withIcon(R.drawable.ic_insert_chart_gray),
+                        new PrimaryDrawerItem().withIdentifier(6).withName("Summary").withIcon(R.drawable.ic_description_gray),
                         new DividerDrawerItem(),
-                        new PrimaryDrawerItem().withIdentifier(10).withName("Backup & Restore"),
-                        new PrimaryDrawerItem().withIdentifier(11).withName("Help"),
+                        new PrimaryDrawerItem().withIdentifier(7).withName("Feedback").withIcon(R.drawable.ic_feedback_gray),
+                        new PrimaryDrawerItem().withIdentifier(8).withName("Help").withIcon(R.drawable.ic_help_gray),
+                        new DividerDrawerItem(),
+                        new PrimaryDrawerItem().withIdentifier(10).withName("Backup").withIcon(R.drawable.ic_backup_gray),
+                        new PrimaryDrawerItem().withIdentifier(11).withName("Restore").withIcon(R.drawable.ic_restore_gray),
                         new DividerDrawerItem(),
                         new PrimaryDrawerItem().withIdentifier(21).withName("Settings").withIcon(R.drawable.ic_settings_gray),
                         new PrimaryDrawerItem().withIdentifier(22).withName("About").withIcon(R.drawable.ic_info_gray)
@@ -100,42 +172,10 @@ public class MainActivity extends AppCompatActivity {
                                 case 0:
                                     switchFragment("Dashboard", "Dashboard");
                                     break;
-
-                                case 10:
-                                    final RealmBackupRestore backupRestore = new RealmBackupRestore(MainActivity.this);
-                                    new AlertDialog.Builder(MainActivity.this)
-                                            .setPositiveButton("Backup", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    backupRestore.backup();
-                                                }
-                                            })
-                                            .setNeutralButton("Restore", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    backupRestore.restore();
-                                                    Intent mStartActivity = new Intent(MainActivity.this,
-                                                            MainActivity.class);
-                                                    int mPendingIntentId = 123456;
-                                                    PendingIntent mPendingIntent = PendingIntent
-                                                            .getActivity(MainActivity.this,
-                                                                    mPendingIntentId, mStartActivity,
-                                                                    PendingIntent.FLAG_CANCEL_CURRENT);
-                                                    AlarmManager mgr = (AlarmManager) MainActivity.this
-                                                            .getSystemService(Context.ALARM_SERVICE);
-                                                    mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100,
-                                                            mPendingIntent);
-                                                    System.exit(0);
-                                                }
-                                            }).show();
-                                    break;
-                                case 11:
-                                    ConversationActivity.show(MainActivity.this);
-                                    break;
-
                                 case 1:
                                     switchFragment("Fund Flow", "FundFlow");
                                     break;
+
                                 case 2:
                                     switchFragment("Share Purchase", "SharePurchase");
                                     break;
@@ -145,6 +185,7 @@ public class MainActivity extends AppCompatActivity {
                                 case 4:
                                     switchFragment("Share Holdings", "ShareHoldings");
                                     break;
+
                                 case 5:
                                     switchFragment("Charts", "Charts");
                                     break;
@@ -152,19 +193,47 @@ public class MainActivity extends AppCompatActivity {
                                     switchFragment("Summary", "Summary");
                                     break;
 
+                                case 7:
+                                    ConversationActivity.show(MainActivity.this);
+                                    break;
+                                case 8:
+                                    startActivity(new Intent(MainActivity.this, IntroActivity.class));
+                                    break;
+
+                                case 10:
+                                    RealmBackupRestore backup = new RealmBackupRestore(MainActivity.this);
+                                    backup.backup();
+                                    break;
+                                case 11:
+                                    RealmBackupRestore restore = new RealmBackupRestore(MainActivity.this);
+                                    restore.restore();
+                                    Intent mStartActivity = new Intent(MainActivity.this, MainActivity.class);
+                                    int mPendingIntentId = 123456;
+                                    PendingIntent mPendingIntent = PendingIntent.getActivity(MainActivity.this,
+                                            mPendingIntentId, mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
+                                    AlarmManager mgr = (AlarmManager) MainActivity.this.getSystemService(Context.ALARM_SERVICE);
+                                    mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
+                                    System.exit(0);
+                                    break;
+
                                 case 21:
                                     startActivity(new Intent(MainActivity.this, ProfileActivity.class));
                                     break;
                                 case 22:
                                     new LibsBuilder()
+                                            .withActivityStyle(Libs.ActivityStyle.LIGHT_DARK_TOOLBAR)
+                                            .withActivityTitle(getString(R.string.app_name))
                                             .withAboutIconShown(true)
                                             .withAboutVersionShown(true)
-                                            .withAboutDescription("Developed By Adithya J")
+                                            .withVersionShown(true)
+                                            .withLicenseShown(true)
+                                            .withLicenseDialog(true)
+                                            .withListener(libsListener)
                                             .start(MainActivity.this);
                                     break;
 
                                 default:
-                                    switchFragment("Fund Flow", "FundFlow");
+                                    switchFragment("Dashboard", "Dashboard");
                                     break;
                             }
                         } else {

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <string name="aboutLibraries_description_name">@string/app_name</string>
+    <string name="aboutLibraries_description_showIcon">true</string>
+    <string name="aboutLibraries_description_showVersion">true</string>
+    <string name="aboutLibraries_description_text">
+        <![CDATA[Developed by <b>Adithya J</b><br />Made with <b>&hearts;</b> in <b>India</b>]]>
+    </string>
+
+    <string name="aboutLibraries_description_special1_name">RATE AND REVIEW</string>
+    <string name="aboutLibraries_description_special2_name">OTHER APPS</string>
+</resources>
