@@ -87,6 +87,10 @@ public class PurchaseShareAdapter extends RecyclerView.Adapter<PurchaseShareAdap
         viewHolder.quantity.setText(purchase.getQuantity() + " shares");
         viewHolder.price.setText(String.valueOf(NumberUtils.round(purchase.getPrice(), 2)));
         viewHolder.value.setText(String.valueOf(NumberUtils.round(value, 2)));
+        if (purchase.getType().equals("buy"))
+            viewHolder.value.setTextColor(getContext().getResources().getColor(R.color.red_500));
+        else
+            viewHolder.value.setTextColor(getContext().getResources().getColor(R.color.colorPrimary));
     }
 
     @Override

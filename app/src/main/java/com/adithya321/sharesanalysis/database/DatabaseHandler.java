@@ -96,7 +96,18 @@ public class DatabaseHandler {
     }
 
     public ArrayList<Purchase> getPurchases() {
-        RealmResults<Purchase> results = realm.where(Purchase.class).findAllSorted("date");
+        RealmResults<Purchase> results = realm.where(Purchase.class).equalTo("type", "buy")
+                .findAllSorted("date", Sort.DESCENDING);
+        ArrayList<Purchase> purchases = new ArrayList<>();
+        for (int i = 0; i < results.size(); i++) {
+            purchases.add(results.get(i));
+        }
+        return purchases;
+    }
+
+    public ArrayList<Purchase> getSales() {
+        RealmResults<Purchase> results = realm.where(Purchase.class).equalTo("type", "sell")
+                .findAllSorted("date", Sort.DESCENDING);
         ArrayList<Purchase> purchases = new ArrayList<>();
         for (int i = 0; i < results.size(); i++) {
             purchases.add(results.get(i));

@@ -147,11 +147,11 @@ public class MainActivity extends AppCompatActivity {
                         new PrimaryDrawerItem().withIdentifier(1).withName("Fund Flow").withIcon(R.drawable.ic_compare_arrows_gray),
                         new DividerDrawerItem(),
                         new PrimaryDrawerItem().withIdentifier(2).withName("Share Purchase")
-                                .withIcon(R.drawable.ic_add_green)
-                                .withTextColor(getResources().getColor(R.color.colorPrimary)),
+                                .withIcon(R.drawable.ic_add_red)
+                                .withTextColor(getResources().getColor(R.color.red_500)),
                         new PrimaryDrawerItem().withIdentifier(3).withName("Share Sales")
-                                .withIcon(R.drawable.ic_remove_red)
-                                .withTextColor(getResources().getColor(android.R.color.holo_red_dark)),
+                                .withIcon(R.drawable.ic_remove_green)
+                                .withTextColor(getResources().getColor(R.color.colorPrimary)),
                         new PrimaryDrawerItem().withIdentifier(4).withName("Share Holdings")
                                 .withIcon(R.drawable.ic_account_balance_blue)
                                 .withTextColor(getResources().getColor(R.color.colorAccent)),
@@ -191,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
                                 case 3:
                                     if (shareList.size() < 1)
                                         drawer.setSelection(2, true);
-                                    else switchFragment("Share Sales", "ShareSales");
+                                    else switchFragment("Share Sales", "SharePurchaseMain");
                                     break;
                                 case 4:
                                     if (shareList.size() < 1)

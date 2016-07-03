@@ -74,7 +74,8 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:gravity="end"
-                android:text="20147.42" />
+                android:text="20147.42"
+                android:textColor="@color/red_500" />
         </LinearLayout>
     </LinearLayout>
 </android.support.v7.widget.CardView>

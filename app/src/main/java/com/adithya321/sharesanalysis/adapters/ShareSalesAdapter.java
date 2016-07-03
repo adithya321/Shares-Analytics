@@ -17,6 +17,7 @@ import com.adithya321.sharesanalysis.recyclerviewdrag.ItemTouchHelperAdapter;
 import com.adithya321.sharesanalysis.recyclerviewdrag.ItemTouchHelperViewHolder;
 import com.adithya321.sharesanalysis.utils.DateUtils;
 import com.adithya321.sharesanalysis.utils.NumberUtils;
+import com.adithya321.sharesanalysis.utils.StringUtils;
 
 import java.util.Collections;
 import java.util.Date;
@@ -43,7 +44,7 @@ public class ShareSalesAdapter extends RecyclerView.Adapter<ShareSalesAdapter.Vi
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
         public final TextView name;
-        public final TextView totalSharesPurchased;
+        public final TextView totalSharesSold;
         public final TextView totalValue;
         public final TextView targetSalePrice;
         public final TextView currentShareValue;
@@ -54,7 +55,7 @@ public class ShareSalesAdapter extends RecyclerView.Adapter<ShareSalesAdapter.Vi
             super(view);
 
             name = (TextView) view.findViewById(R.id.share_name);
-            totalSharesPurchased = (TextView) view.findViewById(R.id.total_shares_sold);
+            totalSharesSold = (TextView) view.findViewById(R.id.total_shares_sold);
             totalValue = (TextView) view.findViewById(R.id.total_value);
             targetSalePrice = (TextView) view.findViewById(R.id.target_sale_price);
             currentShareValue = (TextView) view.findViewById(R.id.current_share_value);
@@ -133,16 +134,20 @@ public class ShareSalesAdapter extends RecyclerView.Adapter<ShareSalesAdapter.Vi
         currentNoOfShares = totalSharesPurchased - totalSharesSold;
         difference = share.getCurrentShareValue() - targetSalePrice;
 
-        viewHolder.name.setText(share.getName());
-        viewHolder.totalSharesPurchased.setText(String.valueOf(totalSharesSold));
+        viewHolder.name.setText(StringUtils.getCode(share.getName()));
+        viewHolder.totalSharesSold.setText(totalSharesSold + " shares sold");
         viewHolder.totalValue.setText(String.valueOf(NumberUtils.round(totalValueSold, 2)));
         viewHolder.targetSalePrice.setText(String.valueOf(NumberUtils.round(targetSalePrice, 2)));
         if (share.getCurrentShareValue() == 0.0)
             viewHolder.currentShareValue.setText("NA");
         else
             viewHolder.currentShareValue.setText(String.valueOf(NumberUtils.round(share.getCurrentShareValue(), 2)));
-        viewHolder.currentNoOfShares.setText(String.valueOf(currentNoOfShares));
+        viewHolder.currentNoOfShares.setText(currentNoOfShares + " shares left");
         viewHolder.difference.setText(String.valueOf(NumberUtils.round(difference, 2)));
+        if (difference < 0)
+            viewHolder.difference.setTextColor(getContext().getResources().getColor((R.color.red_500)));
+        else
+            viewHolder.difference.setTextColor(getContext().getResources().getColor((R.color.colorPrimary)));
     }
 
     @Override

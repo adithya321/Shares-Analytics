@@ -1,9 +1,7 @@
 package com.adithya321.sharesanalysis.fragments;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
-import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,6 +23,7 @@ import com.adithya321.sharesanalysis.adapters.DashboardAdapter;
 import com.adithya321.sharesanalysis.database.DatabaseHandler;
 import com.adithya321.sharesanalysis.database.Share;
 import com.adithya321.sharesanalysis.recyclerviewdrag.SimpleItemTouchHelperCallback;
+import com.adithya321.sharesanalysis.utils.AndroidUtils;
 import com.adithya321.sharesanalysis.utils.StringUtils;
 
 import org.jsoup.Jsoup;
@@ -81,8 +80,7 @@ public class DashboardFragment extends Fragment {
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(sharesRecyclerView);
 
-        if (isNetworkConnected())
-            new CurrentShareValue().execute();
+        if (AndroidUtils.isNetworkConnected(getContext())) new CurrentShareValue().execute();
     }
 
     private class CurrentShareValue extends AsyncTask<Void, Void, Void> {
@@ -122,10 +120,5 @@ public class DashboardFragment extends Fragment {
         protected void onPostExecute(Void aVoid) {
             mDashboardAdapter.notifyDataSetChanged();
         }
-    }
-
-    private boolean isNetworkConnected() {
-        ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        return cm.getActiveNetworkInfo() != null;
     }
 }

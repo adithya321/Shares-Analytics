@@ -28,6 +28,7 @@ import com.adithya321.sharesanalysis.database.Purchase;
 import com.adithya321.sharesanalysis.database.Share;
 import com.adithya321.sharesanalysis.recyclerviewdrag.OnStartDragListener;
 import com.adithya321.sharesanalysis.recyclerviewdrag.SimpleItemTouchHelperCallback;
+import com.adithya321.sharesanalysis.utils.AndroidUtils;
 import com.adithya321.sharesanalysis.utils.StringUtils;
 
 import org.jsoup.Jsoup;
@@ -103,7 +104,7 @@ public class ShareHoldingsFragment extends Fragment implements OnStartDragListen
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(shareHoldingsAdapter);
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(shareHoldingsRecyclerView);
-        new CurrentShareValue().execute();
+        if (AndroidUtils.isNetworkConnected(getContext())) new CurrentShareValue().execute();
     }
 
     private class CurrentShareValue extends AsyncTask<Void, Void, Void> {
@@ -174,7 +175,7 @@ public class ShareHoldingsFragment extends Fragment implements OnStartDragListen
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_refresh) {
-            new CurrentShareValue().execute();
+            if (AndroidUtils.isNetworkConnected(getContext())) new CurrentShareValue().execute();
         }
         return super.onOptionsItemSelected(item);
     }
