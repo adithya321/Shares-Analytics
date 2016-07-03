@@ -15,6 +15,7 @@ import com.adithya321.sharesanalysis.database.Share;
 import com.adithya321.sharesanalysis.recyclerviewdrag.ItemTouchHelperAdapter;
 import com.adithya321.sharesanalysis.recyclerviewdrag.ItemTouchHelperViewHolder;
 import com.adithya321.sharesanalysis.utils.NumberUtils;
+import com.adithya321.sharesanalysis.utils.StringUtils;
 
 import java.util.Calendar;
 import java.util.Collections;
@@ -114,8 +115,8 @@ public class SharePurchaseAdapter extends RecyclerView.Adapter<SharePurchaseAdap
         String date = calendar.get(Calendar.DAY_OF_MONTH) + "/" + (calendar.get(Calendar.MONTH) + 1)
                 + "/" + calendar.get(Calendar.YEAR);
 
-        viewHolder.name.setText(share.getName());
-        viewHolder.totalSharesPurchased.setText(String.valueOf(totalSharesPurchased));
+        viewHolder.name.setText(StringUtils.getCode(share.getName()));
+        viewHolder.totalSharesPurchased.setText(totalSharesPurchased + " shares");
         viewHolder.totalValue.setText(String.valueOf(NumberUtils.round(totalValue, 2)));
         viewHolder.averageShareValue.setText(String.valueOf(NumberUtils.round(averageShareValue, 2)));
         viewHolder.dateOfInitialPurchase.setText(date);

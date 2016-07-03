@@ -32,12 +32,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.adithya321.sharesanalysis.R;
-import com.adithya321.sharesanalysis.adapters.SharePurchaseAdapter;
+import com.adithya321.sharesanalysis.adapters.PurchaseShareAdapter;
 import com.adithya321.sharesanalysis.database.DatabaseHandler;
 import com.adithya321.sharesanalysis.database.Purchase;
 import com.adithya321.sharesanalysis.database.Share;
-import com.adithya321.sharesanalysis.recyclerviewdrag.OnStartDragListener;
-import com.adithya321.sharesanalysis.recyclerviewdrag.SimpleItemTouchHelperCallback;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -52,11 +50,12 @@ import java.util.Locale;
 
 import io.realm.RealmList;
 
-public class SharePurchaseFragment extends Fragment implements OnStartDragListener {
+public class PurchaseShareFragment extends Fragment {
 
     private DatabaseHandler databaseHandler;
     private int year_start, month_start, day_start;
     private List<Share> sharesList;
+    private List<Purchase> purchaseList;
     private RecyclerView sharePurchasesRecyclerView;
     private ItemTouchHelper mItemTouchHelper;
     private TextView emptyTV;
@@ -238,6 +237,7 @@ public class SharePurchaseFragment extends Fragment implements OnStartDragListen
 
     private void setRecyclerViewAdapter() {
         sharesList = databaseHandler.getShares();
+        purchaseList = databaseHandler.getPurchases();
 
         if (sharesList.size() < 1) {
             emptyTV.setVisibility(View.VISIBLE);
@@ -254,8 +254,8 @@ public class SharePurchaseFragment extends Fragment implements OnStartDragListen
             arrow.setVisibility(View.GONE);
         }
 
-        SharePurchaseAdapter sharesAdapter = new SharePurchaseAdapter(getContext(), sharesList);
-        sharesAdapter.setOnItemClickListener(new SharePurchaseAdapter.OnItemClickListener() {
+        PurchaseShareAdapter purchaseAdapter = new PurchaseShareAdapter(getContext(), purchaseList);
+        purchaseAdapter.setOnItemClickListener(new PurchaseShareAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
                 Share share = sharesList.get(position);
@@ -276,30 +276,14 @@ public class SharePurchaseFragment extends Fragment implements OnStartDragListen
                         }).show();
             }
         });
-        sharePurchasesRecyclerView.setAdapter(sharesAdapter);
-        sharePurchasesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
         sharePurchasesRecyclerView.setHasFixedSize(true);
-        sharePurchasesRecyclerView.setAdapter(sharesAdapter);
+        sharePurchasesRecyclerView.setAdapter(purchaseAdapter);
         sharePurchasesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(sharesAdapter);
-        mItemTouchHelper = new ItemTouchHelper(callback);
-        mItemTouchHelper.attachToRecyclerView(sharePurchasesRecyclerView);
-    }
-
-    @Override
-    public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
-        mItemTouchHelper.startDrag(viewHolder);
     }
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-        try {
-            if (isVisibleToUser) setRecyclerViewAdapter();
-        } catch (Exception e) {
-            Log.e("visibleToUser", e.toString());
-        }
+        if (isVisibleToUser) setRecyclerViewAdapter();
     }
 }

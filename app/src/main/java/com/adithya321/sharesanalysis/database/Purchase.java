@@ -6,12 +6,21 @@ import java.util.Date;
 import io.realm.RealmObject;
 
 public class Purchase extends RealmObject {
+    private String name;
     private int quantity;
     private double price;
     private Date date;
     private String type;
 
     public Purchase() {
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public int getQuantity() {

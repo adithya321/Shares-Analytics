@@ -95,6 +95,15 @@ public class DatabaseHandler {
         return shares;
     }
 
+    public ArrayList<Purchase> getPurchases() {
+        RealmResults<Purchase> results = realm.where(Purchase.class).findAllSorted("date");
+        ArrayList<Purchase> purchases = new ArrayList<>();
+        for (int i = 0; i < results.size(); i++) {
+            purchases.add(results.get(i));
+        }
+        return purchases;
+    }
+
     public long getNextKey(String where) {
         Number maxId = null;
         switch (where) {

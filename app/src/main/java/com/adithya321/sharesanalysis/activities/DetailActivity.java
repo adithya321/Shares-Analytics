@@ -55,7 +55,6 @@ public class DetailActivity extends AppCompatActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
-        tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
         TabLayout.Tab tab = tabLayout.getTabAt(pos);
         tab.select();
         getSupportActionBar().setTitle(StringUtils.getName(sharesList.get(pos).getName()));

@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         applicationId "com.adithya321.sharesanalysis"
-        minSdkVersion 16
+        minSdkVersion 17
         targetSdkVersion 24
         versionCode 16
         versionName "0.16"

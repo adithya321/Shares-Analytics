@@ -9,9 +9,8 @@
         android:id="@+id/share_purchases_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="10dp"
-        android:padding="16dp" />
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp" />
 
     <LinearLayout
         android:id="@+id/mainactivity_empty_layout"

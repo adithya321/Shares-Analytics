@@ -186,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
                                     break;
 
                                 case 2:
-                                    switchFragment("Share Purchase", "SharePurchase");
+                                    switchFragment("Share Purchase", "SharePurchaseMain");
                                     break;
                                 case 3:
                                     if (shareList.size() < 1)

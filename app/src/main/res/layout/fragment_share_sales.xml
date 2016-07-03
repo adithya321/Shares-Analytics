@@ -10,8 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:divider="@android:color/transparent"
-        android:dividerHeight="10dp"
-        android:padding="16dp" />
+        android:dividerHeight="10dp" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/sell_share_fab"
