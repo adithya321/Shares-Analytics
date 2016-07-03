@@ -2,11 +2,14 @@ package com.adithya321.sharesanalysis.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -14,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 
 import com.adithya321.sharesanalysis.R;
 import com.adithya321.sharesanalysis.activities.DetailActivity;
@@ -42,6 +46,12 @@ public class DashboardFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_dashboard, container, false);
+
+        Window window = getActivity().getWindow();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
+        ((AppCompatActivity) getActivity()).getSupportActionBar()
+                .setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorPrimary)));
 
         databaseHandler = new DatabaseHandler(getContext());
         sharesRecyclerView = (RecyclerView) root.findViewById(R.id.shares_recycler_view);
@@ -93,7 +103,6 @@ public class DashboardFragment extends Fragment {
                     try {
                         currentShareValue = document.getElementById("yfs_l84_" + code.toLowerCase()
                                 + ".ns").html();
-                        Log.e("CSV", currentShareValue + ":" + code);
                         Realm realm = db.getRealmInstance();
                         realm.beginTransaction();
                         share.setCurrentShareValue(Double.parseDouble(currentShareValue));
@@ -111,7 +120,6 @@ public class DashboardFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
             mDashboardAdapter.notifyDataSetChanged();
         }
     }

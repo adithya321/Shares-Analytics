@@ -3,11 +3,14 @@ package com.adithya321.sharesanalysis.fragments;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -15,14 +18,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.adithya321.sharesanalysis.R;
@@ -53,14 +59,24 @@ public class SharePurchaseFragment extends Fragment implements OnStartDragListen
     private List<Share> sharesList;
     private RecyclerView sharePurchasesRecyclerView;
     private ItemTouchHelper mItemTouchHelper;
+    private TextView emptyTV;
+    private ImageView arrow;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_share_purchase, container, false);
 
+        Window window = getActivity().getWindow();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
+        ((AppCompatActivity) getActivity()).getSupportActionBar()
+                .setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorPrimary)));
+
         databaseHandler = new DatabaseHandler(getContext());
         sharePurchasesRecyclerView = (RecyclerView) root.findViewById(R.id.share_purchases_recycler_view);
+        emptyTV = (TextView) root.findViewById(R.id.empty);
+        arrow = (ImageView) root.findViewById(R.id.arrow);
         setRecyclerViewAdapter();
 
         FloatingActionButton addPurchaseFab = (FloatingActionButton) root.findViewById(R.id.add_purchase_fab);
@@ -220,6 +236,22 @@ public class SharePurchaseFragment extends Fragment implements OnStartDragListen
 
     private void setRecyclerViewAdapter() {
         sharesList = databaseHandler.getShares();
+
+        if (sharesList.size() < 1) {
+            emptyTV.setVisibility(View.VISIBLE);
+            arrow.setVisibility(View.VISIBLE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                if (getResources().getConfiguration().orientation == 1) {
+                    arrow.setBackground(getResources().getDrawable(R.drawable.curved_line_vertical));
+                } else {
+                    arrow.setBackground((getResources().getDrawable(R.drawable.curved_line_horizontal)));
+                }
+            }
+        } else {
+            emptyTV.setVisibility(View.GONE);
+            arrow.setVisibility(View.GONE);
+        }
+
         SharePurchaseAdapter sharesAdapter = new SharePurchaseAdapter(getContext(), sharesList);
         sharesAdapter.setOnItemClickListener(new SharePurchaseAdapter.OnItemClickListener() {
             @Override

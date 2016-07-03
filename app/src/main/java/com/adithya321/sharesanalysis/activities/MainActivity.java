@@ -14,6 +14,8 @@ import android.view.View;
 
 import com.adithya321.sharesanalysis.R;
 import com.adithya321.sharesanalysis.backup.RealmBackupRestore;
+import com.adithya321.sharesanalysis.database.DatabaseHandler;
+import com.adithya321.sharesanalysis.database.Share;
 import com.mikepenz.aboutlibraries.Libs;
 import com.mikepenz.aboutlibraries.LibsBuilder;
 import com.mikepenz.aboutlibraries.LibsConfiguration;
@@ -27,6 +29,8 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+
+import java.util.List;
 
 import cat.ereza.customactivityoncrash.CustomActivityOnCrash;
 import io.smooch.ui.ConversationActivity;
@@ -131,6 +135,8 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .build();
 
+        final DatabaseHandler databaseHandler = new DatabaseHandler(getApplicationContext());
+
         drawer = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
@@ -166,11 +172,14 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                         boolean flag;
+                        List<Share> shareList = databaseHandler.getShares();
                         if (drawerItem != null) {
                             flag = true;
                             switch ((int) drawerItem.getIdentifier()) {
                                 case 0:
-                                    switchFragment("Dashboard", "Dashboard");
+                                    if (shareList.size() < 1)
+                                        drawer.setSelection(2, true);
+                                    else switchFragment("Dashboard", "Dashboard");
                                     break;
                                 case 1:
                                     switchFragment("Fund Flow", "FundFlow");
@@ -180,17 +189,25 @@ public class MainActivity extends AppCompatActivity {
                                     switchFragment("Share Purchase", "SharePurchase");
                                     break;
                                 case 3:
-                                    switchFragment("Share Sales", "ShareSales");
+                                    if (shareList.size() < 1)
+                                        drawer.setSelection(2, true);
+                                    else switchFragment("Share Sales", "ShareSales");
                                     break;
                                 case 4:
-                                    switchFragment("Share Holdings", "ShareHoldings");
+                                    if (shareList.size() < 1)
+                                        drawer.setSelection(2, true);
+                                    else switchFragment("Share Holdings", "ShareHoldings");
                                     break;
 
                                 case 5:
-                                    switchFragment("Charts", "Charts");
+                                    if (shareList.size() < 1)
+                                        drawer.setSelection(2, true);
+                                    else switchFragment("Charts", "Charts");
                                     break;
                                 case 6:
-                                    switchFragment("Summary", "Summary");
+                                    if (shareList.size() < 1)
+                                        drawer.setSelection(2, true);
+                                    else switchFragment("Summary", "Summary");
                                     break;
 
                                 case 7:
@@ -244,13 +261,13 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .build();
 
-        if (savedInstanceState == null) drawer.setSelection(0);
+        if (savedInstanceState == null) drawer.setSelection(0, true);
         else drawer.setSelection(savedInstanceState.getLong("drawerSelection"), true);
 
         CustomActivityOnCrash.install(this);
     }
 
-    public void switchFragment(String title, String fragment) {
+    private void switchFragment(String title, String fragment) {
         if (getSupportActionBar() != null)
             getSupportActionBar().setTitle(title);
 

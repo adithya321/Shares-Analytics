@@ -4,6 +4,10 @@
     <color name="colorPrimaryDark">#689F38</color>
     <color name="colorPrimaryLight">#AED581</color>
     <color name="colorAccent">#03A9F4</color>
+    
+    <color name="red_500">#F44336</color>
+    <color name="red_700">#D32F2F</color>
+    <color name="blue_700">#0288D1</color>
 
     <color name="Smooch_accent">@color/colorPrimary</color>
     <color name="Smooch_accentDark">@color/colorPrimaryDark</color>
