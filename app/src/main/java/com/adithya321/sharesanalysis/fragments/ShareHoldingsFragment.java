@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.ProgressBar;
 
 import com.adithya321.sharesanalysis.R;
 import com.adithya321.sharesanalysis.adapters.ShareHoldingsAdapter;
@@ -169,6 +170,12 @@ public class ShareHoldingsFragment extends Fragment implements OnStartDragListen
         actionRefreshItem = menu.findItem(R.id.action_refresh);
         actionProgressItem.setVisible(true);
         actionRefreshItem.setVisible(false);
+
+        ProgressBar progressBar = (ProgressBar) actionProgressItem.getActionView()
+                .findViewById(R.id.pbProgressAction);
+        progressBar.getIndeterminateDrawable().setColorFilter(getResources()
+                .getColor(android.R.color.white), android.graphics.PorterDuff.Mode.SRC_IN);
+
         super.onCreateOptionsMenu(menu, inflater);
     }
 

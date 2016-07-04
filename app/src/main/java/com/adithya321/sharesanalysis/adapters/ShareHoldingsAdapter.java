@@ -17,6 +17,7 @@ import com.adithya321.sharesanalysis.recyclerviewdrag.ItemTouchHelperAdapter;
 import com.adithya321.sharesanalysis.recyclerviewdrag.ItemTouchHelperViewHolder;
 import com.adithya321.sharesanalysis.utils.DateUtils;
 import com.adithya321.sharesanalysis.utils.NumberUtils;
+import com.adithya321.sharesanalysis.utils.StringUtils;
 
 import java.util.Collections;
 import java.util.Date;
@@ -43,29 +44,21 @@ public class ShareHoldingsAdapter extends RecyclerView.Adapter<ShareHoldingsAdap
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
         public final TextView name;
-        public final TextView averageShareValue;
+        public final TextView currentNoOfShares;
         public final TextView currentShareValue;
-        public final TextView percentageChange;
+        public final TextView percentChange;
         public final TextView noOfDays;
-        public final TextView valueSold;
-        public final TextView totalProfit;
-        public final TextView currentStockValue;
-        public final TextView targetTotalProfit;
         public final TextView reward;
 
         public ViewHolder(final View view) {
             super(view);
 
-            name = (TextView) view.findViewById(R.id.share_name);
-            averageShareValue = (TextView) view.findViewById(R.id.average_share_value);
-            currentShareValue = (TextView) view.findViewById(R.id.current_share_value);
-            percentageChange = (TextView) view.findViewById(R.id.percentage_change);
-            noOfDays = (TextView) view.findViewById(R.id.no_of_days);
-            valueSold = (TextView) view.findViewById(R.id.value_sold);
-            totalProfit = (TextView) view.findViewById(R.id.total_profit);
-            currentStockValue = (TextView) view.findViewById(R.id.current_stock_value);
-            targetTotalProfit = (TextView) view.findViewById(R.id.target_total_profit);
-            reward = (TextView) view.findViewById(R.id.reward);
+            name = (TextView) view.findViewById(R.id.holdings_share_name);
+            currentNoOfShares = (TextView) view.findViewById(R.id.holdings_current_no_of_shares);
+            noOfDays = (TextView) view.findViewById(R.id.holdings_days);
+            reward = (TextView) view.findViewById(R.id.holdings_reward);
+            currentShareValue = (TextView) view.findViewById(R.id.holdings_current_price);
+            percentChange = (TextView) view.findViewById(R.id.holdings_percent_change);
 
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -113,11 +106,10 @@ public class ShareHoldingsAdapter extends RecyclerView.Adapter<ShareHoldingsAdap
         double totalValuePurchased = 0;
         double totalValueSold = 0;
         double averageShareValue = 0;
-        double percentageChange = 0;
+        double percentChange = 0;
         double totalProfit = 0;
         double targetTotalProfit = 0;
         double reward = 0;
-        double currentStockValue = 0;
 
         RealmList<Purchase> purchases = share.getPurchases();
         for (Purchase purchase : purchases) {
@@ -132,7 +124,7 @@ public class ShareHoldingsAdapter extends RecyclerView.Adapter<ShareHoldingsAdap
         if (totalSharesPurchased != 0)
             averageShareValue = totalValuePurchased / totalSharesPurchased;
 
-        percentageChange = ((share.getCurrentShareValue() - averageShareValue) / averageShareValue) * 100;
+        percentChange = ((share.getCurrentShareValue() - averageShareValue) / averageShareValue) * 100;
         Date today = new Date();
         Date start = share.getDateOfInitialPurchase();
         long noOfDays = DateUtils.getDateDiff(start, today, TimeUnit.DAYS);
@@ -141,24 +133,27 @@ public class ShareHoldingsAdapter extends RecyclerView.Adapter<ShareHoldingsAdap
 
         int currentNoOfShares = totalSharesPurchased - totalSharesSold;
         totalProfit = totalValueSold - totalValuePurchased;
-        currentStockValue = currentNoOfShares * share.getCurrentShareValue();
         double target = sharedPreferences.getFloat("target", 0);
         targetTotalProfit = (target / 100) * totalValuePurchased * ((double) noOfDays / 365);
         reward = totalProfit - targetTotalProfit;
 
-        viewHolder.name.setText(share.getName());
-        viewHolder.averageShareValue.setText(String.valueOf(NumberUtils.round(averageShareValue, 2)));
+        viewHolder.name.setText(StringUtils.getCode(share.getName()));
+        viewHolder.currentNoOfShares.setText(currentNoOfShares + " shares");
+        viewHolder.noOfDays.setText(noOfDays + " days");
+        viewHolder.reward.setText(String.valueOf(NumberUtils.round(reward, 2)));
+        if (reward < 0)
+            viewHolder.reward.setTextColor(getContext().getResources().getColor((R.color.red_500)));
+        else
+            viewHolder.reward.setTextColor(getContext().getResources().getColor((R.color.colorPrimary)));
         if (share.getCurrentShareValue() == 0.0)
             viewHolder.currentShareValue.setText("NA");
         else
             viewHolder.currentShareValue.setText(String.valueOf(NumberUtils.round(share.getCurrentShareValue(), 2)));
-        viewHolder.percentageChange.setText(String.valueOf(NumberUtils.round(percentageChange, 2)));
-        viewHolder.noOfDays.setText(String.valueOf(noOfDays));
-        viewHolder.valueSold.setText(String.valueOf(NumberUtils.round(totalValueSold, 2)));
-        viewHolder.totalProfit.setText(String.valueOf(NumberUtils.round(totalProfit, 2)));
-        viewHolder.currentStockValue.setText(String.valueOf(NumberUtils.round(currentStockValue, 2)));
-        viewHolder.targetTotalProfit.setText(String.valueOf(NumberUtils.round(targetTotalProfit, 2)));
-        viewHolder.reward.setText(String.valueOf(NumberUtils.round(reward, 2)));
+        viewHolder.percentChange.setText(String.valueOf(NumberUtils.round(percentChange, 2)));
+        if (percentChange < 0)
+            viewHolder.percentChange.setTextColor(getContext().getResources().getColor((R.color.red_500)));
+        else
+            viewHolder.percentChange.setTextColor(getContext().getResources().getColor((R.color.colorPrimary)));
     }
 
     @Override

@@ -118,7 +118,7 @@ public class DashboardAdapter extends RecyclerView.Adapter<DashboardAdapter.View
         viewHolder.currentnoOfShares.setText(currentNoOfShares + " shares");
         viewHolder.shareChange.setText(NumberUtils.round(percentChange, 2) + "%");
         if (percentChange < 0)
-            viewHolder.shareChange.setTextColor(getContext().getResources().getColor((android.R.color.holo_red_dark)));
+            viewHolder.shareChange.setTextColor(getContext().getResources().getColor((R.color.red_500)));
         else
             viewHolder.shareChange.setTextColor(getContext().getResources().getColor((R.color.colorPrimary)));
     }
