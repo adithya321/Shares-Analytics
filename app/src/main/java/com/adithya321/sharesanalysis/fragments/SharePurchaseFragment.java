@@ -36,10 +36,8 @@ import com.adithya321.sharesanalysis.database.Purchase;
 import com.adithya321.sharesanalysis.database.Share;
 import com.adithya321.sharesanalysis.recyclerviewdrag.OnStartDragListener;
 import com.adithya321.sharesanalysis.recyclerviewdrag.SimpleItemTouchHelperCallback;
+import com.adithya321.sharesanalysis.utils.ShareUtils;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -83,21 +81,10 @@ public class SharePurchaseFragment extends Fragment implements OnStartDragListen
                 dialog.show();
 
                 final AutoCompleteTextView name = (AutoCompleteTextView) dialog.findViewById(R.id.share_name);
-                final List<String> nseList = new ArrayList<>();
-                try {
-                    InputStream inputStream = getActivity().getAssets().open("NSE-datasets-codes.csv");
-                    InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                    BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                    String line;
-                    while ((line = bufferedReader.readLine()) != null) {
-                        nseList.add(line);
-                    }
-                    ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(getContext(),
-                            android.R.layout.simple_dropdown_item_1line, nseList);
-                    name.setAdapter(arrayAdapter);
-                } catch (Exception e) {
-                    Log.e("AutoComplete", e.toString());
-                }
+                List<String> nseList = ShareUtils.getNseList(getContext());
+                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(getContext(),
+                        android.R.layout.simple_dropdown_item_1line, nseList);
+                name.setAdapter(arrayAdapter);
 
                 final Spinner spinner = (Spinner) dialog.findViewById(R.id.existing_spinner);
 
@@ -160,6 +147,7 @@ public class SharePurchaseFragment extends Fragment implements OnStartDragListen
                         share.setId(databaseHandler.getNextKey("share"));
                         share.setPurchases(new RealmList<Purchase>());
                         Purchase purchase = new Purchase();
+                        purchase.setId(databaseHandler.getNextKey("purchase"));
 
                         if (newRB.isChecked()) {
                             String sName = name.getText().toString().trim();

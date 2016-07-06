@@ -82,9 +82,9 @@ public class DatabaseHandler {
         });
     }
 
-    public void updateShare(Share share) {
+    public void updatePurchase(Purchase purchase) {
         realm.beginTransaction();
-        realm.copyToRealmOrUpdate(share);
+        realm.copyToRealmOrUpdate(purchase);
         realm.commitTransaction();
     }
 
@@ -137,6 +137,8 @@ public class DatabaseHandler {
             case "share":
                 maxId = realm.where(Share.class).max("id");
                 break;
+            case "purchase":
+                maxId = realm.where(Purchase.class).max("id");
 
             default:
                 return 0;

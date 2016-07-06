@@ -106,6 +106,7 @@ public class SalesShareFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         Purchase purchase = new Purchase();
+                        purchase.setId(databaseHandler.getNextKey("purchase"));
                         purchase.setName(spinner.getSelectedItem().toString());
 
                         String stringStartDate = year_start + " " + month_start + " " + day_start;

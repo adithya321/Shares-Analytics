@@ -53,8 +53,7 @@
         </activity>
         <activity
             android:name=".activities.SharePurchaseDetailActivity"
-            android:parentActivityName=".activities.MainActivity"
-            android:theme="@style/MaterialDrawerTheme.Light.DarkToolbar.ActionBar">
+            android:parentActivityName=".activities.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.adithya321.sharesanalysis.activities.MainActivity" />

@@ -8,10 +8,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,10 +31,8 @@ import com.adithya321.sharesanalysis.adapters.PurchaseShareAdapter;
 import com.adithya321.sharesanalysis.database.DatabaseHandler;
 import com.adithya321.sharesanalysis.database.Purchase;
 import com.adithya321.sharesanalysis.database.Share;
+import com.adithya321.sharesanalysis.utils.ShareUtils;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -47,14 +43,13 @@ import java.util.Locale;
 
 import io.realm.RealmList;
 
-public class PurchaseShareFragment extends Fragment {
+public class PurchaseShareFragment extends Fragment implements View.OnClickListener {
 
     private DatabaseHandler databaseHandler;
     private int year_start, month_start, day_start;
     private List<Share> sharesList;
     private List<Purchase> purchaseList;
     private RecyclerView sharePurchasesRecyclerView;
-    private ItemTouchHelper mItemTouchHelper;
     private TextView emptyTV;
     private ImageView arrow;
 
@@ -81,24 +76,12 @@ public class PurchaseShareFragment extends Fragment {
                 dialog.show();
 
                 final AutoCompleteTextView name = (AutoCompleteTextView) dialog.findViewById(R.id.share_name);
-                final List<String> nseList = new ArrayList<>();
-                try {
-                    InputStream inputStream = getActivity().getAssets().open("NSE-datasets-codes.csv");
-                    InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                    BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                    String line;
-                    while ((line = bufferedReader.readLine()) != null) {
-                        nseList.add(line);
-                    }
-                    ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(getContext(),
-                            android.R.layout.simple_dropdown_item_1line, nseList);
-                    name.setAdapter(arrayAdapter);
-                } catch (Exception e) {
-                    Log.e("AutoComplete", e.toString());
-                }
+                List<String> nseList = ShareUtils.getNseList(getContext());
+                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(getContext(),
+                        android.R.layout.simple_dropdown_item_1line, nseList);
+                name.setAdapter(arrayAdapter);
 
                 final Spinner spinner = (Spinner) dialog.findViewById(R.id.existing_spinner);
-
                 ArrayList<String> shares = new ArrayList<>();
                 for (Share share : sharesList) {
                     shares.add(share.getName());
@@ -134,21 +117,7 @@ public class PurchaseShareFragment extends Fragment {
                 final Button selectDate = (Button) dialog.findViewById(R.id.select_date);
                 selectDate.setText(new StringBuilder().append(day_start).append("/")
                         .append(month_start).append("/").append(year_start));
-                selectDate.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Dialog dialog = new DatePickerDialog(getActivity(), onDateSetListener,
-                                year_start, month_start - 1, day_start);
-                        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                            @Override
-                            public void onDismiss(DialogInterface dialog) {
-                                selectDate.setText(new StringBuilder().append(day_start).append("/")
-                                        .append(month_start).append("/").append(year_start));
-                            }
-                        });
-                        dialog.show();
-                    }
-                });
+                selectDate.setOnClickListener(this);
 
                 Button addPurchaseBtn = (Button) dialog.findViewById(R.id.add_purchase_btn);
                 addPurchaseBtn.setOnClickListener(new View.OnClickListener() {
@@ -158,6 +127,7 @@ public class PurchaseShareFragment extends Fragment {
                         share.setId(databaseHandler.getNextKey("share"));
                         share.setPurchases(new RealmList<Purchase>());
                         Purchase purchase = new Purchase();
+                        purchase.setId(databaseHandler.getNextKey("purchase"));
 
                         if (newRB.isChecked()) {
                             String sName = name.getText().toString().trim();
@@ -250,27 +220,117 @@ public class PurchaseShareFragment extends Fragment {
         purchaseAdapter.setOnItemClickListener(new PurchaseShareAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
-                Share share = sharesList.get(position);
+                Purchase purchase = purchaseList.get(position);
 
-                RealmList<Purchase> purchases = share.getPurchases();
-                String string = "";
-                for (Purchase purchase : purchases) {
-                    if (purchase.getType().equals("buy"))
-                        string = string.concat(purchase.toString() + "\n\n");
+                final Dialog dialog = new Dialog(getContext());
+                dialog.setTitle("Edit Share Purchase");
+                dialog.setContentView(R.layout.dialog_add_share_purchase);
+                dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT,
+                        WindowManager.LayoutParams.WRAP_CONTENT);
+                dialog.show();
+
+                RadioButton newRB = (RadioButton) dialog.findViewById(R.id.radioBtn_new);
+                RadioButton existingRB = (RadioButton) dialog.findViewById(R.id.radioBtn_existing);
+                AutoCompleteTextView name = (AutoCompleteTextView) dialog.findViewById(R.id.share_name);
+                newRB.setVisibility(View.GONE);
+                existingRB.setChecked(true);
+                name.setVisibility(View.GONE);
+
+                final Spinner spinner = (Spinner) dialog.findViewById(R.id.existing_spinner);
+                ArrayList<String> shares = new ArrayList<>();
+                int pos = 0;
+                for (int i = 0; i < sharesList.size(); i++) {
+                    shares.add(sharesList.get(i).getName());
+                    if (sharesList.get(i).getName().equals(purchase.getName()))
+                        pos = i;
                 }
-                new AlertDialog.Builder(getActivity())
-                        .setTitle(share.getName())
-                        .setMessage(string)
-                        .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        }).show();
+                ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getContext(),
+                        android.R.layout.simple_spinner_item, shares);
+                spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinner.setAdapter(spinnerAdapter);
+                spinner.setSelection(pos);
+                spinner.setVisibility(View.VISIBLE);
+
+                final EditText quantity = (EditText) dialog.findViewById(R.id.no_of_shares);
+                final EditText price = (EditText) dialog.findViewById(R.id.buying_price);
+                quantity.setText(String.valueOf(purchase.getQuantity()));
+                price.setText(String.valueOf(purchase.getPrice()));
+
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(purchase.getDate());
+                year_start = calendar.get(Calendar.YEAR);
+                month_start = calendar.get(Calendar.MONTH) + 1;
+                day_start = calendar.get(Calendar.DAY_OF_MONTH);
+                final Button selectDate = (Button) dialog.findViewById(R.id.select_date);
+                selectDate.setText(new StringBuilder().append(day_start).append("/")
+                        .append(month_start).append("/").append(year_start));
+                selectDate.setOnClickListener(PurchaseShareFragment.this);
+
+                Button addPurchaseBtn = (Button) dialog.findViewById(R.id.add_purchase_btn);
+                addPurchaseBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Share share = new Share();
+                        share.setId(databaseHandler.getNextKey("share"));
+                        share.setPurchases(new RealmList<Purchase>());
+                        Purchase purchase = new Purchase();
+                        purchase.setId(databaseHandler.getNextKey("purchase"));
+
+                        String stringStartDate = year_start + " " + month_start + " " + day_start;
+                        DateFormat format = new SimpleDateFormat("yyyy MM dd", Locale.ENGLISH);
+                        try {
+                            Date date = format.parse(stringStartDate);
+                            share.setDateOfInitialPurchase(date);
+                            purchase.setDate(date);
+                        } catch (Exception e) {
+                            Toast.makeText(getActivity(), "Invalid Date", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        try {
+                            purchase.setQuantity(Integer.parseInt(quantity.getText().toString()));
+                        } catch (Exception e) {
+                            Toast.makeText(getActivity(), "Invalid Number of Shares", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        try {
+                            purchase.setPrice(Double.parseDouble(price.getText().toString()));
+                        } catch (Exception e) {
+                            Toast.makeText(getActivity(), "Invalid Buying Price", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        purchase.setType("buy");
+                        purchase.setName(spinner.getSelectedItem().toString());
+                        databaseHandler.updatePurchase(purchase);
+                        setRecyclerViewAdapter();
+                        dialog.dismiss();
+                    }
+                });
             }
         });
         sharePurchasesRecyclerView.setHasFixedSize(true);
         sharePurchasesRecyclerView.setAdapter(purchaseAdapter);
         sharePurchasesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+    }
+
+    @Override
+    public void onClick(final View view) {
+        switch (view.getId()) {
+            case R.id.select_date:
+                Dialog dialog = new DatePickerDialog(getActivity(), onDateSetListener,
+                        year_start, month_start - 1, day_start);
+                dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        ((TextView) view).setText(new StringBuilder().append(day_start).append("/")
+                                .append(month_start).append("/").append(year_start));
+                    }
+                });
+                dialog.show();
+                break;
+        }
     }
 
     @Override

@@ -4,8 +4,11 @@ import java.util.Calendar;
 import java.util.Date;
 
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 public class Purchase extends RealmObject {
+    @PrimaryKey
+    private long id;
     private String name;
     private int quantity;
     private double price;
@@ -13,6 +16,14 @@ public class Purchase extends RealmObject {
     private String type;
 
     public Purchase() {
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getName() {
