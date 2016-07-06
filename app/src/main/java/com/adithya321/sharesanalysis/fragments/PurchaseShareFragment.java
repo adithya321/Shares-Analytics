@@ -204,6 +204,7 @@ public class PurchaseShareFragment extends Fragment {
                                 return;
                             }
                         } else {
+                            purchase.setName(spinner.getSelectedItem().toString());
                             databaseHandler.addPurchase(spinner.getSelectedItem().toString(), purchase);
                         }
                         setRecyclerViewAdapter();
@@ -275,6 +276,20 @@ public class PurchaseShareFragment extends Fragment {
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-        if (isVisibleToUser) setRecyclerViewAdapter();
+        try {
+            if (isVisibleToUser) setRecyclerViewAdapter();
+        } catch (Exception e) {
+            Log.e("visibleToUser", e.toString());
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        try {
+            setRecyclerViewAdapter();
+        } catch (Exception e) {
+            Log.e("onResume", e.toString());
+        }
     }
 }

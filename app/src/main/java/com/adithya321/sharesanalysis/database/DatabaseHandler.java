@@ -7,6 +7,7 @@ import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import io.realm.RealmList;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
@@ -67,6 +68,18 @@ public class DatabaseHandler {
         realm.copyToRealm(share);
         realm.commitTransaction();
         return true;
+    }
+
+    public void deleteShare(Share share) {
+        final RealmResults<Share> shares = realm.where(Share.class).equalTo("name", share.getName()).findAll();
+        final RealmList<Purchase> purchases = shares.get(0).getPurchases();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                purchases.deleteAllFromRealm();
+                shares.deleteAllFromRealm();
+            }
+        });
     }
 
     public void updateShare(Share share) {

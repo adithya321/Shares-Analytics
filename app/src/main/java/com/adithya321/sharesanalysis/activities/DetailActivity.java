@@ -6,6 +6,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 
 import com.adithya321.sharesanalysis.R;
 import com.adithya321.sharesanalysis.adapters.SectionsPagerAdapter;
@@ -58,5 +59,16 @@ public class DetailActivity extends AppCompatActivity {
         TabLayout.Tab tab = tabLayout.getTabAt(pos);
         tab.select();
         getSupportActionBar().setTitle(StringUtils.getName(sharesList.get(pos).getName()));
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == android.R.id.home) {
+            super.onBackPressed();
+            return true;
+        }
+        return false;
     }
 }

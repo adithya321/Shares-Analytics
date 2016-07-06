@@ -3,12 +3,12 @@ package com.adithya321.sharesanalysis.fragments;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -29,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.adithya321.sharesanalysis.R;
+import com.adithya321.sharesanalysis.activities.SharePurchaseDetailActivity;
 import com.adithya321.sharesanalysis.adapters.SharePurchaseAdapter;
 import com.adithya321.sharesanalysis.database.DatabaseHandler;
 import com.adithya321.sharesanalysis.database.Purchase;
@@ -205,6 +206,7 @@ public class SharePurchaseFragment extends Fragment implements OnStartDragListen
                                 return;
                             }
                         } else {
+                            purchase.setName(spinner.getSelectedItem().toString());
                             databaseHandler.addPurchase(spinner.getSelectedItem().toString(), purchase);
                         }
                         setRecyclerViewAdapter();
@@ -250,21 +252,8 @@ public class SharePurchaseFragment extends Fragment implements OnStartDragListen
             @Override
             public void onItemClick(View itemView, int position) {
                 Share share = sharesList.get(position);
-
-                RealmList<Purchase> purchases = share.getPurchases();
-                String string = "";
-                for (Purchase purchase : purchases) {
-                    if (purchase.getType().equals("buy"))
-                        string = string.concat(purchase.toString() + "\n\n");
-                }
-                new AlertDialog.Builder(getActivity())
-                        .setTitle(share.getName())
-                        .setMessage(string)
-                        .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        }).show();
+                startActivity(new Intent(getActivity(), SharePurchaseDetailActivity.class)
+                        .putExtra("name", share.getName()));
             }
         });
         sharePurchasesRecyclerView.setAdapter(sharesAdapter);
@@ -291,6 +280,16 @@ public class SharePurchaseFragment extends Fragment implements OnStartDragListen
             if (isVisibleToUser) setRecyclerViewAdapter();
         } catch (Exception e) {
             Log.e("visibleToUser", e.toString());
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        try {
+            setRecyclerViewAdapter();
+        } catch (Exception e) {
+            Log.e("onResume", e.toString());
         }
     }
 }
