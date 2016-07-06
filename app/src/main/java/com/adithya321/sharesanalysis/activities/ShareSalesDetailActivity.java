@@ -3,6 +3,7 @@ package com.adithya321.sharesanalysis.activities;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,11 +18,9 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,6 +30,7 @@ import com.adithya321.sharesanalysis.adapters.PurchaseShareAdapter;
 import com.adithya321.sharesanalysis.database.DatabaseHandler;
 import com.adithya321.sharesanalysis.database.Purchase;
 import com.adithya321.sharesanalysis.database.Share;
+import com.adithya321.sharesanalysis.utils.DateUtils;
 import com.adithya321.sharesanalysis.utils.NumberUtils;
 import com.adithya321.sharesanalysis.utils.StringUtils;
 
@@ -41,18 +41,21 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import io.realm.RealmList;
 
-public class SharePurchaseDetailActivity extends AppCompatActivity implements View.OnClickListener {
+public class ShareSalesDetailActivity extends AppCompatActivity implements View.OnClickListener {
     private DatabaseHandler databaseHandler;
     private List<Share> shareList;
-    private List<Purchase> buyList;
+    private List<Purchase> sellList;
     private TextView mainTotalValueTV;
     private TextView totalSharesTV;
-    private TextView totalValueTV;
     private TextView averageValueTV;
-    private TextView dateOfInitialPurchaseTV;
+    private TextView totalValueTV;
+    private TextView targetValueTV;
+    private TextView currentValueTV;
+    private TextView differenceTV;
     private RecyclerView purchasesRecyclerView;
     private Share share;
     private int year_start, month_start, day_start;
@@ -74,26 +77,28 @@ public class SharePurchaseDetailActivity extends AppCompatActivity implements Vi
     }
 
     private void setView() {
-        setContentView(R.layout.activity_share_purchase_details);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.spd_toolbar);
+        setContentView(R.layout.activity_share_sales_details);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.ssd_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Window window = getWindow();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            window.setStatusBarColor(getResources().getColor(R.color.red_700));
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.red_500)));
+            window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorPrimary)));
         getSupportActionBar().setTitle(StringUtils.getName(getIntent().getStringExtra("name")));
 
-        mainTotalValueTV = (TextView) findViewById(R.id.spd_main_total_value);
-        totalSharesTV = (TextView) findViewById(R.id.spd_total_shares);
-        totalValueTV = (TextView) findViewById(R.id.spd_total_value);
-        averageValueTV = (TextView) findViewById(R.id.spd_average_value);
-        dateOfInitialPurchaseTV = (TextView) findViewById(R.id.spd_date);
-        purchasesRecyclerView = (RecyclerView) findViewById(R.id.spd_purchase_recycler_view);
+        mainTotalValueTV = (TextView) findViewById(R.id.ssd_main_total_value);
+        totalSharesTV = (TextView) findViewById(R.id.ssd_total_shares);
+        averageValueTV = (TextView) findViewById(R.id.ssd_average_value);
+        totalValueTV = (TextView) findViewById(R.id.ssd_total_value);
+        targetValueTV = (TextView) findViewById(R.id.ssd_target_price);
+        currentValueTV = (TextView) findViewById(R.id.ssd_current_value);
+        differenceTV = (TextView) findViewById(R.id.ssd_difference);
+        purchasesRecyclerView = (RecyclerView) findViewById(R.id.ssd_sales_recycler_view);
     }
 
     private void setValues() {
-        databaseHandler = new DatabaseHandler(SharePurchaseDetailActivity.this);
+        databaseHandler = new DatabaseHandler(ShareSalesDetailActivity.this);
         shareList = databaseHandler.getShares();
         share = new Share();
         for (Share s : shareList) {
@@ -103,55 +108,67 @@ public class SharePurchaseDetailActivity extends AppCompatActivity implements Vi
             }
         }
 
+        int totalSharesSold = 0;
         int totalSharesPurchased = 0;
-        double totalValue = 0;
-        double averageShareValue = 0;
+        double totalValueSold = 0;
+        double totalValuePurchased = 0;
+        double averagePurchaseValue = 0;
+        double averageSaleValue = 0;
+        double targetSalePrice = 0;
+        double difference = 0;
 
-        buyList = new ArrayList<>();
+        sellList = new ArrayList<>();
         RealmList<Purchase> purchaseList = share.getPurchases();
         for (Purchase purchase : purchaseList) {
-            if (purchase.getType().equals("buy")) {
-                buyList.add(purchase);
+            if (purchase.getType().equals("sell")) {
+                sellList.add(purchase);
+                totalSharesSold += purchase.getQuantity();
+                totalValueSold += (purchase.getQuantity() * purchase.getPrice());
+            } else if (purchase.getType().equals("buy")) {
                 totalSharesPurchased += purchase.getQuantity();
-                totalValue += (purchase.getQuantity() * purchase.getPrice());
+                totalValuePurchased += (purchase.getQuantity() * purchase.getPrice());
             }
         }
         if (totalSharesPurchased != 0)
-            averageShareValue = totalValue / totalSharesPurchased;
+            averagePurchaseValue = totalValuePurchased / totalSharesPurchased;
+        if (totalSharesSold != 0)
+            averageSaleValue = totalValueSold / totalSharesSold;
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(share.getDateOfInitialPurchase());
-        String date = calendar.get(Calendar.DAY_OF_MONTH) + "/" + (calendar.get(Calendar.MONTH) + 1)
-                + "/" + calendar.get(Calendar.YEAR);
+        Date today = new Date();
+        Date start = share.getDateOfInitialPurchase();
+        long noOfDays = DateUtils.getDateDiff(start, today, TimeUnit.DAYS);
+        SharedPreferences sharedPreferences = getSharedPreferences("prefs", 0);
+        double target = sharedPreferences.getFloat("target", 0);
+        targetSalePrice = averagePurchaseValue * Math.pow((1 + (target / 100)), ((double) noOfDays / 365));
+        difference = share.getCurrentShareValue() - targetSalePrice;
 
-        mainTotalValueTV.setText("₹" + NumberUtils.round(totalValue, 2));
-        totalSharesTV.setText(totalSharesPurchased + " shares");
-        totalValueTV.setText("₹" + NumberUtils.round(totalValue, 2));
-        averageValueTV.setText("₹" + NumberUtils.round(averageShareValue, 2));
-        dateOfInitialPurchaseTV.setText(date);
+        mainTotalValueTV.setText("₹" + NumberUtils.round(totalValueSold, 2));
+        totalSharesTV.setText(totalSharesSold + " shares");
+        averageValueTV.setText("₹" + NumberUtils.round(averageSaleValue, 2));
+        totalValueTV.setText("₹" + NumberUtils.round(totalValueSold, 2));
+        targetValueTV.setText("₹" + NumberUtils.round(targetSalePrice, 2));
+        currentValueTV.setText("₹" + NumberUtils.round(share.getCurrentShareValue(), 2));
+        differenceTV.setText(String.valueOf(NumberUtils.round(difference, 2)));
+        if (difference < 0)
+            differenceTV.setTextColor(getResources().getColor((R.color.red_500)));
+        else
+            differenceTV.setTextColor(getResources().getColor((R.color.colorPrimary)));
         setRecyclerViewAdapter();
     }
 
     private void setRecyclerViewAdapter() {
-        PurchaseShareAdapter purchaseAdapter = new PurchaseShareAdapter(SharePurchaseDetailActivity.this, buyList);
-        purchaseAdapter.setOnItemClickListener(new PurchaseShareAdapter.OnItemClickListener() {
+        PurchaseShareAdapter salesAdapter = new PurchaseShareAdapter(ShareSalesDetailActivity.this, sellList);
+        salesAdapter.setOnItemClickListener(new PurchaseShareAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
-                Purchase purchase = buyList.get(position);
+                Purchase purchase = sellList.get(position);
 
-                final Dialog dialog = new Dialog(SharePurchaseDetailActivity.this);
-                dialog.setTitle("Edit Share Purchase");
-                dialog.setContentView(R.layout.dialog_add_share_purchase);
+                final Dialog dialog = new Dialog(ShareSalesDetailActivity.this);
+                dialog.setTitle("Edit Share Sale");
+                dialog.setContentView(R.layout.dialog_sell_share_holdings);
                 dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT,
                         WindowManager.LayoutParams.WRAP_CONTENT);
                 dialog.show();
-
-                RadioButton newRB = (RadioButton) dialog.findViewById(R.id.radioBtn_new);
-                RadioButton existingRB = (RadioButton) dialog.findViewById(R.id.radioBtn_existing);
-                AutoCompleteTextView name = (AutoCompleteTextView) dialog.findViewById(R.id.share_name);
-                newRB.setVisibility(View.GONE);
-                existingRB.setChecked(true);
-                name.setVisibility(View.GONE);
 
                 final Spinner spinner = (Spinner) dialog.findViewById(R.id.existing_spinner);
                 ArrayList<String> shares = new ArrayList<>();
@@ -161,7 +178,7 @@ public class SharePurchaseDetailActivity extends AppCompatActivity implements Vi
                     if (shareList.get(i).getName().equals(purchase.getName()))
                         pos = i;
                 }
-                ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(SharePurchaseDetailActivity.this,
+                ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(ShareSalesDetailActivity.this,
                         android.R.layout.simple_spinner_item, shares);
                 spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinner.setAdapter(spinnerAdapter);
@@ -169,7 +186,7 @@ public class SharePurchaseDetailActivity extends AppCompatActivity implements Vi
                 spinner.setVisibility(View.VISIBLE);
 
                 final EditText quantity = (EditText) dialog.findViewById(R.id.no_of_shares);
-                final EditText price = (EditText) dialog.findViewById(R.id.buying_price);
+                final EditText price = (EditText) dialog.findViewById(R.id.selling_price);
                 quantity.setText(String.valueOf(purchase.getQuantity()));
                 price.setText(String.valueOf(purchase.getPrice()));
 
@@ -181,10 +198,10 @@ public class SharePurchaseDetailActivity extends AppCompatActivity implements Vi
                 final Button selectDate = (Button) dialog.findViewById(R.id.select_date);
                 selectDate.setText(new StringBuilder().append(day_start).append("/")
                         .append(month_start).append("/").append(year_start));
-                selectDate.setOnClickListener(SharePurchaseDetailActivity.this);
+                selectDate.setOnClickListener(ShareSalesDetailActivity.this);
 
-                Button addPurchaseBtn = (Button) dialog.findViewById(R.id.add_purchase_btn);
-                addPurchaseBtn.setOnClickListener(new View.OnClickListener() {
+                Button sellShareBtn = (Button) dialog.findViewById(R.id.sell_share_btn);
+                sellShareBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Share share = new Share();
@@ -198,25 +215,25 @@ public class SharePurchaseDetailActivity extends AppCompatActivity implements Vi
                             share.setDateOfInitialPurchase(date);
                             purchase.setDate(date);
                         } catch (Exception e) {
-                            Toast.makeText(SharePurchaseDetailActivity.this, "Invalid Date", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ShareSalesDetailActivity.this, "Invalid Date", Toast.LENGTH_SHORT).show();
                             return;
                         }
 
                         try {
                             purchase.setQuantity(Integer.parseInt(quantity.getText().toString()));
                         } catch (Exception e) {
-                            Toast.makeText(SharePurchaseDetailActivity.this, "Invalid Number of Shares", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ShareSalesDetailActivity.this, "Invalid Number of Shares", Toast.LENGTH_SHORT).show();
                             return;
                         }
 
                         try {
                             purchase.setPrice(Double.parseDouble(price.getText().toString()));
                         } catch (Exception e) {
-                            Toast.makeText(SharePurchaseDetailActivity.this, "Invalid Buying Price", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ShareSalesDetailActivity.this, "Invalid Buying Price", Toast.LENGTH_SHORT).show();
                             return;
                         }
 
-                        purchase.setType("buy");
+                        purchase.setType("sell");
                         purchase.setName(spinner.getSelectedItem().toString());
                         databaseHandler.updatePurchase(purchase);
                         setValues();
@@ -227,8 +244,8 @@ public class SharePurchaseDetailActivity extends AppCompatActivity implements Vi
             }
         });
         purchasesRecyclerView.setHasFixedSize(true);
-        purchasesRecyclerView.setAdapter(purchaseAdapter);
-        purchasesRecyclerView.setLayoutManager(new LinearLayoutManager(SharePurchaseDetailActivity.this));
+        purchasesRecyclerView.setAdapter(salesAdapter);
+        purchasesRecyclerView.setLayoutManager(new LinearLayoutManager(ShareSalesDetailActivity.this));
     }
 
     @Override
@@ -271,7 +288,7 @@ public class SharePurchaseDetailActivity extends AppCompatActivity implements Vi
     public void onClick(final View view) {
         switch (view.getId()) {
             case R.id.select_date:
-                Dialog dialog = new DatePickerDialog(SharePurchaseDetailActivity.this, onDateSetListener,
+                Dialog dialog = new DatePickerDialog(ShareSalesDetailActivity.this, onDateSetListener,
                         year_start, month_start - 1, day_start);
                 dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override

@@ -6,21 +6,21 @@
     android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/spd_toolbar"
+        android:id="@+id/ssd_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
         app:theme="@style/MaterialDrawerTheme" />
 
     <TextView
-        android:id="@+id/spd_main_total_value"
+        android:id="@+id/ssd_main_total_value"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="32dp"
         android:gravity="center"
         android:text="18631"
         android:textAppearance="?android:textAppearanceLarge"
-        android:textColor="@color/red_500"
+        android:textColor="@color/colorPrimary"
         android:textSize="32sp"
         android:textStyle="bold" />
 
@@ -30,7 +30,7 @@
         android:orientation="horizontal">
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_margin="8dp"
             android:layout_weight="1"
@@ -41,7 +41,7 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:gravity="center_vertical"
-                android:text="Total Shares Purchased" />
+                android:text="Total Shares Sold" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -49,7 +49,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_weight="1"
                 android:gravity="center_vertical"
-                android:text="Average Purchase Value" />
+                android:text="Average Sale Value" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -57,7 +57,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_weight="1"
                 android:gravity="center_vertical"
-                android:text="Total Purchase Value" />
+                android:text="Total Sale Value" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -65,18 +65,34 @@
                 android:layout_marginTop="8dp"
                 android:layout_weight="1"
                 android:gravity="center_vertical"
-                android:text="Date of Initial Purchase" />
+                android:text="Sale price to obtain target profit" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="Current share value" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="Difference" />
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:layout_weight="1"
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/spd_total_shares"
+                android:id="@+id/ssd_total_shares"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="end"
@@ -85,7 +101,7 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/spd_average_value"
+                android:id="@+id/ssd_average_value"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -95,24 +111,45 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/spd_total_value"
+                android:id="@+id/ssd_total_value"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:gravity="end"
                 android:text="18631"
                 android:textAppearance="?android:textAppearanceMedium"
-                android:textColor="@color/red_500"
+                android:textColor="@color/colorPrimary"
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/spd_date"
+                android:id="@+id/ssd_target_price"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:gravity="end"
-                android:text="03/08/2016"
+                android:text="195.17"
                 android:textAppearance="?android:textAppearanceMedium"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/ssd_current_value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="end"
+                android:text="210.92"
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/ssd_difference"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="end"
+                android:text="15.75"
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textColor="@color/colorPrimary"
                 android:textStyle="bold" />
         </LinearLayout>
     </LinearLayout>
@@ -121,11 +158,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:text="Puchases"
+        android:text="Sales"
         android:textStyle="bold" />
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/spd_purchase_recycler_view"
+        android:id="@+id/ssd_sales_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 </LinearLayout>

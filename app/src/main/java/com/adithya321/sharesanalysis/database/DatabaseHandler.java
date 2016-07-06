@@ -139,6 +139,7 @@ public class DatabaseHandler {
                 break;
             case "purchase":
                 maxId = realm.where(Purchase.class).max("id");
+                break;
 
             default:
                 return 0;

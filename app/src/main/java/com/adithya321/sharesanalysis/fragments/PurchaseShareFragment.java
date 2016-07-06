@@ -271,10 +271,8 @@ public class PurchaseShareFragment extends Fragment implements View.OnClickListe
                     @Override
                     public void onClick(View v) {
                         Share share = new Share();
-                        share.setId(databaseHandler.getNextKey("share"));
                         share.setPurchases(new RealmList<Purchase>());
                         Purchase purchase = new Purchase();
-                        purchase.setId(databaseHandler.getNextKey("purchase"));
 
                         String stringStartDate = year_start + " " + month_start + " " + day_start;
                         DateFormat format = new SimpleDateFormat("yyyy MM dd", Locale.ENGLISH);

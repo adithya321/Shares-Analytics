@@ -3,12 +3,12 @@ package com.adithya321.sharesanalysis.fragments;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -28,6 +28,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.adithya321.sharesanalysis.R;
+import com.adithya321.sharesanalysis.activities.ShareSalesDetailActivity;
 import com.adithya321.sharesanalysis.adapters.ShareSalesAdapter;
 import com.adithya321.sharesanalysis.database.DatabaseHandler;
 import com.adithya321.sharesanalysis.database.Purchase;
@@ -49,7 +50,6 @@ import java.util.List;
 import java.util.Locale;
 
 import io.realm.Realm;
-import io.realm.RealmList;
 
 public class ShareSalesFragment extends Fragment implements OnStartDragListener {
 
@@ -184,21 +184,8 @@ public class ShareSalesFragment extends Fragment implements OnStartDragListener 
             @Override
             public void onItemClick(View itemView, int position) {
                 Share share = sharesList.get(position);
-
-                RealmList<Purchase> purchases = share.getPurchases();
-                String string = "";
-                for (Purchase purchase : purchases) {
-                    if (purchase.getType().equals("sell"))
-                        string = string.concat(purchase.toString() + "\n\n");
-                }
-                new AlertDialog.Builder(getActivity())
-                        .setTitle(share.getName())
-                        .setMessage(string)
-                        .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        }).show();
+                startActivity(new Intent(getActivity(), ShareSalesDetailActivity.class)
+                        .putExtra("name", share.getName()));
             }
         });
         salesRecyclerView.setAdapter(shareSalesAdapter);
@@ -298,6 +285,16 @@ public class ShareSalesFragment extends Fragment implements OnStartDragListener 
             if (isVisibleToUser) setRecyclerViewAdapter();
         } catch (Exception e) {
             Log.e("visibleToUser", e.toString());
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        try {
+            setRecyclerViewAdapter();
+        } catch (Exception e) {
+            Log.e("onResume", e.toString());
         }
     }
 }
