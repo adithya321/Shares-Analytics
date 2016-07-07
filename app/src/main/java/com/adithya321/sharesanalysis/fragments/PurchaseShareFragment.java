@@ -220,7 +220,7 @@ public class PurchaseShareFragment extends Fragment implements View.OnClickListe
         purchaseAdapter.setOnItemClickListener(new PurchaseShareAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
-                Purchase purchase = purchaseList.get(position);
+                final Purchase purchase = purchaseList.get(position);
 
                 final Dialog dialog = new Dialog(getContext());
                 dialog.setTitle("Edit Share Purchase");
@@ -270,38 +270,36 @@ public class PurchaseShareFragment extends Fragment implements View.OnClickListe
                 addPurchaseBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Share share = new Share();
-                        share.setPurchases(new RealmList<Purchase>());
-                        Purchase purchase = new Purchase();
+                        Purchase p = new Purchase();
+                        p.setId(purchase.getId());
 
                         String stringStartDate = year_start + " " + month_start + " " + day_start;
                         DateFormat format = new SimpleDateFormat("yyyy MM dd", Locale.ENGLISH);
                         try {
                             Date date = format.parse(stringStartDate);
-                            share.setDateOfInitialPurchase(date);
-                            purchase.setDate(date);
+                            p.setDate(date);
                         } catch (Exception e) {
                             Toast.makeText(getActivity(), "Invalid Date", Toast.LENGTH_SHORT).show();
                             return;
                         }
 
                         try {
-                            purchase.setQuantity(Integer.parseInt(quantity.getText().toString()));
+                            p.setQuantity(Integer.parseInt(quantity.getText().toString()));
                         } catch (Exception e) {
                             Toast.makeText(getActivity(), "Invalid Number of Shares", Toast.LENGTH_SHORT).show();
                             return;
                         }
 
                         try {
-                            purchase.setPrice(Double.parseDouble(price.getText().toString()));
+                            p.setPrice(Double.parseDouble(price.getText().toString()));
                         } catch (Exception e) {
                             Toast.makeText(getActivity(), "Invalid Buying Price", Toast.LENGTH_SHORT).show();
                             return;
                         }
 
-                        purchase.setType("buy");
-                        purchase.setName(spinner.getSelectedItem().toString());
-                        databaseHandler.updatePurchase(purchase);
+                        p.setType("buy");
+                        p.setName(spinner.getSelectedItem().toString());
+                        databaseHandler.updatePurchase(p);
                         setRecyclerViewAdapter();
                         dialog.dismiss();
                     }

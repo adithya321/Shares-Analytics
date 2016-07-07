@@ -124,10 +124,10 @@ public class SharePurchaseDetailActivity extends AppCompatActivity implements Vi
         String date = calendar.get(Calendar.DAY_OF_MONTH) + "/" + (calendar.get(Calendar.MONTH) + 1)
                 + "/" + calendar.get(Calendar.YEAR);
 
-        mainTotalValueTV.setText("₹" + NumberUtils.round(totalValue, 2));
+        mainTotalValueTV.setText(String.valueOf(NumberUtils.round(totalValue, 2)));
         totalSharesTV.setText(totalSharesPurchased + " shares");
-        totalValueTV.setText("₹" + NumberUtils.round(totalValue, 2));
-        averageValueTV.setText("₹" + NumberUtils.round(averageShareValue, 2));
+        totalValueTV.setText(String.valueOf(NumberUtils.round(totalValue, 2)));
+        averageValueTV.setText(String.valueOf(NumberUtils.round(averageShareValue, 2)));
         dateOfInitialPurchaseTV.setText(date);
         setRecyclerViewAdapter();
     }
@@ -137,7 +137,7 @@ public class SharePurchaseDetailActivity extends AppCompatActivity implements Vi
         purchaseAdapter.setOnItemClickListener(new PurchaseShareAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
-                Purchase purchase = buyList.get(position);
+                final Purchase purchase = buyList.get(position);
 
                 final Dialog dialog = new Dialog(SharePurchaseDetailActivity.this);
                 dialog.setTitle("Edit Share Purchase");
@@ -187,38 +187,36 @@ public class SharePurchaseDetailActivity extends AppCompatActivity implements Vi
                 addPurchaseBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Share share = new Share();
-                        share.setPurchases(new RealmList<Purchase>());
-                        Purchase purchase = new Purchase();
+                        Purchase p = new Purchase();
+                        p.setId(purchase.getId());
 
                         String stringStartDate = year_start + " " + month_start + " " + day_start;
                         DateFormat format = new SimpleDateFormat("yyyy MM dd", Locale.ENGLISH);
                         try {
                             Date date = format.parse(stringStartDate);
-                            share.setDateOfInitialPurchase(date);
-                            purchase.setDate(date);
+                            p.setDate(date);
                         } catch (Exception e) {
                             Toast.makeText(SharePurchaseDetailActivity.this, "Invalid Date", Toast.LENGTH_SHORT).show();
                             return;
                         }
 
                         try {
-                            purchase.setQuantity(Integer.parseInt(quantity.getText().toString()));
+                            p.setQuantity(Integer.parseInt(quantity.getText().toString()));
                         } catch (Exception e) {
                             Toast.makeText(SharePurchaseDetailActivity.this, "Invalid Number of Shares", Toast.LENGTH_SHORT).show();
                             return;
                         }
 
                         try {
-                            purchase.setPrice(Double.parseDouble(price.getText().toString()));
+                            p.setPrice(Double.parseDouble(price.getText().toString()));
                         } catch (Exception e) {
                             Toast.makeText(SharePurchaseDetailActivity.this, "Invalid Buying Price", Toast.LENGTH_SHORT).show();
                             return;
                         }
 
-                        purchase.setType("buy");
-                        purchase.setName(spinner.getSelectedItem().toString());
-                        databaseHandler.updatePurchase(purchase);
+                        p.setType("buy");
+                        p.setName(spinner.getSelectedItem().toString());
+                        databaseHandler.updatePurchase(p);
                         setValues();
                         setRecyclerViewAdapter();
                         dialog.dismiss();

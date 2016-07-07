@@ -124,7 +124,8 @@ public class ShareHoldingsAdapter extends RecyclerView.Adapter<ShareHoldingsAdap
         if (totalSharesPurchased != 0)
             averageShareValue = totalValuePurchased / totalSharesPurchased;
 
-        percentChange = ((share.getCurrentShareValue() - averageShareValue) / averageShareValue) * 100;
+        if (averageShareValue != 0)
+            percentChange = ((share.getCurrentShareValue() - averageShareValue) / averageShareValue) * 100;
         Date today = new Date();
         Date start = share.getDateOfInitialPurchase();
         long noOfDays = DateUtils.getDateDiff(start, today, TimeUnit.DAYS);
@@ -152,6 +153,8 @@ public class ShareHoldingsAdapter extends RecyclerView.Adapter<ShareHoldingsAdap
         viewHolder.percentChange.setText(String.valueOf(NumberUtils.round(percentChange, 2)));
         if (percentChange < 0)
             viewHolder.percentChange.setTextColor(getContext().getResources().getColor((R.color.red_500)));
+        else if (percentChange >= target)
+            viewHolder.percentChange.setTextColor(getContext().getResources().getColor((R.color.colorAccent)));
         else
             viewHolder.percentChange.setTextColor(getContext().getResources().getColor((R.color.colorPrimary)));
     }

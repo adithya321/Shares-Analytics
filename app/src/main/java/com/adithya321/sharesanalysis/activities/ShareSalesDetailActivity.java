@@ -142,12 +142,12 @@ public class ShareSalesDetailActivity extends AppCompatActivity implements View.
         targetSalePrice = averagePurchaseValue * Math.pow((1 + (target / 100)), ((double) noOfDays / 365));
         difference = share.getCurrentShareValue() - targetSalePrice;
 
-        mainTotalValueTV.setText("₹" + NumberUtils.round(totalValueSold, 2));
+        mainTotalValueTV.setText(String.valueOf(NumberUtils.round(totalValueSold, 2)));
         totalSharesTV.setText(totalSharesSold + " shares");
-        averageValueTV.setText("₹" + NumberUtils.round(averageSaleValue, 2));
-        totalValueTV.setText("₹" + NumberUtils.round(totalValueSold, 2));
-        targetValueTV.setText("₹" + NumberUtils.round(targetSalePrice, 2));
-        currentValueTV.setText("₹" + NumberUtils.round(share.getCurrentShareValue(), 2));
+        averageValueTV.setText(String.valueOf(NumberUtils.round(averageSaleValue, 2)));
+        totalValueTV.setText(String.valueOf(NumberUtils.round(totalValueSold, 2)));
+        targetValueTV.setText(String.valueOf(NumberUtils.round(targetSalePrice, 2)));
+        currentValueTV.setText(String.valueOf(NumberUtils.round(share.getCurrentShareValue(), 2)));
         differenceTV.setText(String.valueOf(NumberUtils.round(difference, 2)));
         if (difference < 0)
             differenceTV.setTextColor(getResources().getColor((R.color.red_500)));
@@ -161,7 +161,7 @@ public class ShareSalesDetailActivity extends AppCompatActivity implements View.
         salesAdapter.setOnItemClickListener(new PurchaseShareAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
-                Purchase purchase = sellList.get(position);
+                final Purchase purchase = sellList.get(position);
 
                 final Dialog dialog = new Dialog(ShareSalesDetailActivity.this);
                 dialog.setTitle("Edit Share Sale");
@@ -204,38 +204,36 @@ public class ShareSalesDetailActivity extends AppCompatActivity implements View.
                 sellShareBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Share share = new Share();
-                        share.setPurchases(new RealmList<Purchase>());
-                        Purchase purchase = new Purchase();
+                        Purchase p = new Purchase();
+                        p.setId(purchase.getId());
 
                         String stringStartDate = year_start + " " + month_start + " " + day_start;
                         DateFormat format = new SimpleDateFormat("yyyy MM dd", Locale.ENGLISH);
                         try {
                             Date date = format.parse(stringStartDate);
-                            share.setDateOfInitialPurchase(date);
-                            purchase.setDate(date);
+                            p.setDate(date);
                         } catch (Exception e) {
                             Toast.makeText(ShareSalesDetailActivity.this, "Invalid Date", Toast.LENGTH_SHORT).show();
                             return;
                         }
 
                         try {
-                            purchase.setQuantity(Integer.parseInt(quantity.getText().toString()));
+                            p.setQuantity(Integer.parseInt(quantity.getText().toString()));
                         } catch (Exception e) {
                             Toast.makeText(ShareSalesDetailActivity.this, "Invalid Number of Shares", Toast.LENGTH_SHORT).show();
                             return;
                         }
 
                         try {
-                            purchase.setPrice(Double.parseDouble(price.getText().toString()));
+                            p.setPrice(Double.parseDouble(price.getText().toString()));
                         } catch (Exception e) {
                             Toast.makeText(ShareSalesDetailActivity.this, "Invalid Buying Price", Toast.LENGTH_SHORT).show();
                             return;
                         }
 
-                        purchase.setType("sell");
-                        purchase.setName(spinner.getSelectedItem().toString());
-                        databaseHandler.updatePurchase(purchase);
+                        p.setType("sell");
+                        p.setName(spinner.getSelectedItem().toString());
+                        databaseHandler.updatePurchase(p);
                         setValues();
                         setRecyclerViewAdapter();
                         dialog.dismiss();

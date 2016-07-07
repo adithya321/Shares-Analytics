@@ -19,7 +19,7 @@ import android.view.Window;
 
 import com.adithya321.sharesanalysis.R;
 import com.adithya321.sharesanalysis.activities.DetailActivity;
-import com.adithya321.sharesanalysis.adapters.DashboardAdapter;
+import com.adithya321.sharesanalysis.adapters.ShareHoldingsAdapter;
 import com.adithya321.sharesanalysis.database.DatabaseHandler;
 import com.adithya321.sharesanalysis.database.Share;
 import com.adithya321.sharesanalysis.recyclerviewdrag.SimpleItemTouchHelperCallback;
@@ -37,7 +37,7 @@ public class DashboardFragment extends Fragment {
 
     private DatabaseHandler databaseHandler;
     private List<Share> sharesList;
-    private DashboardAdapter mDashboardAdapter;
+    private ShareHoldingsAdapter mDashboardAdapter;
     private RecyclerView sharesRecyclerView;
     private ItemTouchHelper mItemTouchHelper;
 
@@ -61,8 +61,8 @@ public class DashboardFragment extends Fragment {
 
     private void setRecyclerViewAdapter() {
         sharesList = databaseHandler.getShares();
-        mDashboardAdapter = new DashboardAdapter(getContext(), sharesList);
-        mDashboardAdapter.setOnItemClickListener(new DashboardAdapter.OnItemClickListener() {
+        mDashboardAdapter = new ShareHoldingsAdapter(getContext(), sharesList);
+        mDashboardAdapter.setOnItemClickListener(new ShareHoldingsAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
                 Intent intent = new Intent(getContext(), DetailActivity.class);

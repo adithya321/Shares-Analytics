@@ -251,7 +251,8 @@ public class DetailFragment extends Fragment {
         if (totalSharesPurchased != 0)
             averageShareValue = totalValuePurchased / totalSharesPurchased;
 
-        percentageChange = ((share.getCurrentShareValue() - averageShareValue) / averageShareValue) * 100;
+        if (averageShareValue != 0)
+            percentageChange = ((share.getCurrentShareValue() - averageShareValue) / averageShareValue) * 100;
         Date today = new Date();
         Date start = share.getDateOfInitialPurchase();
         long noOfDays = DateUtils.getDateDiff(start, today, TimeUnit.DAYS);

@@ -1,13 +1,12 @@
 package com.adithya321.sharesanalysis.fragments;
 
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,9 +22,9 @@ import android.view.Window;
 import android.widget.ProgressBar;
 
 import com.adithya321.sharesanalysis.R;
+import com.adithya321.sharesanalysis.activities.ShareHoldingsDetailActivity;
 import com.adithya321.sharesanalysis.adapters.ShareHoldingsAdapter;
 import com.adithya321.sharesanalysis.database.DatabaseHandler;
-import com.adithya321.sharesanalysis.database.Purchase;
 import com.adithya321.sharesanalysis.database.Share;
 import com.adithya321.sharesanalysis.recyclerviewdrag.OnStartDragListener;
 import com.adithya321.sharesanalysis.recyclerviewdrag.SimpleItemTouchHelperCallback;
@@ -38,7 +37,6 @@ import org.jsoup.nodes.Document;
 import java.util.List;
 
 import io.realm.Realm;
-import io.realm.RealmList;
 
 public class ShareHoldingsFragment extends Fragment implements OnStartDragListener {
 
@@ -80,20 +78,8 @@ public class ShareHoldingsFragment extends Fragment implements OnStartDragListen
             @Override
             public void onItemClick(View itemView, int position) {
                 Share share = sharesList.get(position);
-
-                RealmList<Purchase> purchases = share.getPurchases();
-                String string = "";
-                for (Purchase purchase : purchases) {
-                    string = string.concat(purchase.toString() + "\n\n");
-                }
-                new AlertDialog.Builder(getActivity())
-                        .setTitle(share.getName())
-                        .setMessage(string)
-                        .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        }).show();
+                startActivity(new Intent(getActivity(), ShareHoldingsDetailActivity.class)
+                        .putExtra("name", share.getName()));
             }
         });
         shareHoldingsRecyclerView.setAdapter(shareHoldingsAdapter);
@@ -190,5 +176,15 @@ public class ShareHoldingsFragment extends Fragment implements OnStartDragListen
     @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
         mItemTouchHelper.startDrag(viewHolder);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        try {
+            setRecyclerViewAdapter();
+        } catch (Exception e) {
+            Log.e("onResume", e.toString());
+        }
     }
 }
