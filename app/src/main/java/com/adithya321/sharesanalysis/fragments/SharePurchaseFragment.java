@@ -30,6 +30,7 @@ import android.widget.Toast;
 
 import com.adithya321.sharesanalysis.R;
 import com.adithya321.sharesanalysis.activities.SharePurchaseDetailActivity;
+import com.adithya321.sharesanalysis.adapters.FilterWithSpaceAdapter;
 import com.adithya321.sharesanalysis.adapters.SharePurchaseAdapter;
 import com.adithya321.sharesanalysis.database.DatabaseHandler;
 import com.adithya321.sharesanalysis.database.Purchase;
@@ -82,8 +83,9 @@ public class SharePurchaseFragment extends Fragment implements OnStartDragListen
 
                 final AutoCompleteTextView name = (AutoCompleteTextView) dialog.findViewById(R.id.share_name);
                 List<String> nseList = ShareUtils.getNseList(getContext());
-                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(getContext(),
+                FilterWithSpaceAdapter<String> arrayAdapter = new FilterWithSpaceAdapter<>(getContext(),
                         android.R.layout.simple_dropdown_item_1line, nseList);
+                name.setThreshold(1);
                 name.setAdapter(arrayAdapter);
 
                 final Spinner spinner = (Spinner) dialog.findViewById(R.id.existing_spinner);

@@ -13,8 +13,7 @@ apply plugin: 'jacoco-android'
 
 android {
     compileSdkVersion 24
-    buildToolsVersion "24.0.0"
-
+    buildToolsVersion "24.0.1"
     lintOptions {
         abortOnError false
     }
@@ -23,10 +22,11 @@ android {
         applicationId "com.adithya321.sharesanalysis"
         minSdkVersion 17
         targetSdkVersion 24
-        versionCode 18
-        versionName "0.18"
+        versionCode 19
+        versionName "0.19"
 
         vectorDrawables.useSupportLibrary = true
+        multiDexEnabled = true
     }
     buildTypes {
         release {
@@ -40,9 +40,7 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     testCompile 'junit:junit:4.12'
-
-    compile 'com.android.support:support-v13:24.0.0'
-
+    compile 'com.android.support:support-v13:24.2.1'
     compile('com.mikepenz:aboutlibraries:5.6.8@aar') {
         transitive = true
     }
@@ -53,9 +51,10 @@ dependencies {
     }
     compile 'org.jsoup:jsoup:1.9.2'
     compile 'com.robinhood.spark:spark:1.1.1'
+    compile 'com.robinhood.ticker:ticker:1.1.0'
 
     //Smooch
-    compile 'com.google.android.gms:play-services-gcm:9.2.0'
+    compile 'com.google.android.gms:play-services-gcm:9.6.1'
     compile 'com.google.code.gson:gson:2.4'
     compile 'com.squareup.okhttp3:okhttp:3.3.1'
     compile 'io.smooch:core:latest.release'

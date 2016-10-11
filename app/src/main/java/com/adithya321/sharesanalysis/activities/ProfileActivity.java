@@ -33,7 +33,6 @@ public class ProfileActivity extends AppCompatActivity {
         if (!sharedPreferences.getBoolean("first", true)) {
             activityHelloName.setText(sharedPreferences.getString("name", ""));
             activityHelloTarget.setText(String.valueOf(sharedPreferences.getFloat("target", 0)));
-            //activityHelloBankROI.setText(String.valueOf(sharedPreferences.getFloat("bankROI", 0)));
         }
 
         activityHelloButtonStart.setOnClickListener(new View.OnClickListener() {
@@ -41,11 +40,9 @@ public class ProfileActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (!activityHelloName.getText().toString().trim().equals("")
                         && !activityHelloTarget.getText().toString().trim().equals("")) {
-                    //&& !activityHelloBankROI.getText().toString().trim().equals("")) {
                     editor = sharedPreferences.edit();
                     editor.putString("name", activityHelloName.getText().toString());
                     editor.putFloat("target", Float.parseFloat(activityHelloTarget.getText().toString()));
-                    //editor.putFloat("bankROI", Float.parseFloat(activityHelloBankROI.getText().toString()));
                     editor.putBoolean("first", false);
                     editor.apply();
 
