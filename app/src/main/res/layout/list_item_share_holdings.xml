@@ -1,249 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Shares Analysis
+  ~ Copyright (C) 2016  Adithya J
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>
+  -->
+
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    android:foreground="?android:attr/selectableItemBackground">
+    android:foreground="?android:attr/selectableItemBackground"
+    android:orientation="horizontal"
+    app:cardCornerRadius="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/share_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="SBI"
-            android:textAppearance="?android:textAppearanceLarge" />
-
-        <RelativeLayout
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
             android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp">
+            android:layout_weight="1"
+            android:orientation="vertical">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Average Share Value" />
+                android:id="@+id/holdings_share_name"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="KARURVYSYA"
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/average_share_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
+                android:id="@+id/holdings_current_no_of_shares"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="10 shares"
+                android:textColor="@color/colorAccent" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/holdings_days"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="186.31"
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/holdings_reward"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
                 android:text="186.31" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/average_share_value"
-                android:layout_marginTop="8dp"
-                android:text="Current Share Value" />
+                android:id="@+id/holdings_current_price"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:text="186.31"
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/current_share_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_below="@id/average_share_value"
-                android:layout_marginTop="8dp"
-                android:text="210.92" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/current_share_value"
-                android:layout_marginTop="8dp"
-                android:text="% change" />
-
-            <TextView
-                android:id="@+id/percentage_change"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_below="@id/current_share_value"
-                android:layout_marginTop="8dp"
-                android:text="13.21" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/percentage_change"
-                android:layout_marginTop="8dp"
-                android:text="No of Days" />
-
-            <TextView
-                android:id="@+id/no_of_days"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_below="@id/percentage_change"
-                android:layout_marginTop="8dp"
-                android:text="93" />
-
-            <!--<TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/no_of_days"
-                android:layout_marginTop="8dp"
-                android:text="Bank Value" />
-
-            <TextView
-                android:id="@+id/bank_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_below="@id/no_of_days"
-                android:layout_marginTop="8dp"
-                android:text="19176.82" />-->
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/no_of_days"
-                android:layout_marginTop="8dp"
-                android:text="Value sold" />
-
-            <TextView
-                android:id="@+id/value_sold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_below="@id/no_of_days"
-                android:layout_marginTop="8dp"
-                android:text="20475.30" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/value_sold"
-                android:layout_marginTop="8dp"
-                android:text="Total Profit" />
-
-            <TextView
-                android:id="@+id/total_profit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_below="@id/value_sold"
-                android:layout_marginTop="8dp"
-                android:text="1844.30" />
-
-            <!--<TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/total_profit"
-                android:layout_marginTop="8dp"
-                android:text="Current Bank Value" />
-
-            <TextView
-                android:id="@+id/current_bank_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_below="@id/total_profit"
-                android:layout_marginTop="8dp"
-                android:text="0.00" />-->
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/total_profit"
-                android:layout_marginTop="8dp"
-                android:text="Current Stock Value" />
-
-            <TextView
-                android:id="@+id/current_stock_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_below="@id/total_profit"
-                android:layout_marginTop="8dp"
-                android:text="0.00" />
-
-            <!--<TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/current_stock_value"
-                android:layout_marginTop="8dp"
-                android:text="Nett profit" />
-
-            <TextView
-                android:id="@+id/nett_profit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_below="@id/current_stock_value"
-                android:layout_marginTop="8dp"
-                android:text="1298.48" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/nett_profit"
-                android:layout_marginTop="8dp"
-                android:text="Potential profit" />
-
-            <TextView
-                android:id="@+id/potential_profit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_below="@id/nett_profit"
-                android:layout_marginTop="8dp"
-                android:text="0.00" />-->
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/current_stock_value"
-                android:layout_marginTop="8dp"
-                android:text="Target total profit" />
-
-            <TextView
-                android:id="@+id/target_total_profit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_below="@id/current_stock_value"
-                android:layout_marginTop="8dp"
-                android:text="949.42" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/target_total_profit"
-                android:layout_marginTop="8dp"
-                android:text="Reward" />
-
-            <TextView
-                android:id="@+id/reward"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_below="@id/target_total_profit"
-                android:layout_marginTop="8dp"
-                android:text="894.88" />
-        </RelativeLayout>
+                android:id="@+id/holdings_percent_change"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:text="186.31" />
+        </LinearLayout>
     </LinearLayout>
 </android.support.v7.widget.CardView>

@@ -1,3 +1,21 @@
+/*
+ * Shares Analysis
+ * Copyright (C) 2016  Adithya J
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ */
+
 package com.adithya321.sharesanalysis.database;
 
 import android.content.Context;
@@ -7,6 +25,7 @@ import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import io.realm.RealmList;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
@@ -69,9 +88,21 @@ public class DatabaseHandler {
         return true;
     }
 
-    public void updateShare(Share share){
+    public void deleteShare(Share share) {
+        final RealmResults<Share> shares = realm.where(Share.class).equalTo("name", share.getName()).findAll();
+        final RealmList<Purchase> purchases = shares.get(0).getPurchases();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                purchases.deleteAllFromRealm();
+                shares.deleteAllFromRealm();
+            }
+        });
+    }
+
+    public void updatePurchase(Purchase purchase) {
         realm.beginTransaction();
-        realm.copyToRealmOrUpdate(share);
+        realm.copyToRealmOrUpdate(purchase);
         realm.commitTransaction();
     }
 
@@ -87,7 +118,7 @@ public class DatabaseHandler {
     }
 
     public ArrayList<Share> getShares() {
-        RealmResults<Share> results = realm.where(Share.class).findAll();
+        RealmResults<Share> results = realm.where(Share.class).findAllSorted("id");
         ArrayList<Share> shares = new ArrayList<>();
         for (int i = 0; i < results.size(); i++) {
             shares.add(results.get(i));
@@ -95,9 +126,43 @@ public class DatabaseHandler {
         return shares;
     }
 
-    public long getNextKey() {
-        Number id = realm.where(Fund.class).max("id");
-        if (id == null) return 0;
-        else return Long.parseLong(id.toString()) + 1;
+    public ArrayList<Purchase> getPurchases() {
+        RealmResults<Purchase> results = realm.where(Purchase.class).equalTo("type", "buy")
+                .findAllSorted("date", Sort.DESCENDING);
+        ArrayList<Purchase> purchases = new ArrayList<>();
+        for (int i = 0; i < results.size(); i++) {
+            purchases.add(results.get(i));
+        }
+        return purchases;
+    }
+
+    public ArrayList<Purchase> getSales() {
+        RealmResults<Purchase> results = realm.where(Purchase.class).equalTo("type", "sell")
+                .findAllSorted("date", Sort.DESCENDING);
+        ArrayList<Purchase> purchases = new ArrayList<>();
+        for (int i = 0; i < results.size(); i++) {
+            purchases.add(results.get(i));
+        }
+        return purchases;
+    }
+
+    public long getNextKey(String where) {
+        Number maxId = null;
+        switch (where) {
+            case "fund":
+                maxId = realm.where(Fund.class).max("id");
+                break;
+            case "share":
+                maxId = realm.where(Share.class).max("id");
+                break;
+            case "purchase":
+                maxId = realm.where(Purchase.class).max("id");
+                break;
+
+            default:
+                return 0;
+        }
+        if (maxId == null) return 0;
+        else return Long.parseLong(maxId.toString()) + 1;
     }
 }

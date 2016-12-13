@@ -1,7 +1,26 @@
+/*
+ * Shares Analysis
+ * Copyright (C) 2016  Adithya J
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ */
+
 package com.adithya321.sharesanalysis.adapters;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,18 +28,25 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.adithya321.sharesanalysis.R;
+import com.adithya321.sharesanalysis.database.DatabaseHandler;
 import com.adithya321.sharesanalysis.database.Purchase;
 import com.adithya321.sharesanalysis.database.Share;
+import com.adithya321.sharesanalysis.recyclerviewdrag.ItemTouchHelperAdapter;
+import com.adithya321.sharesanalysis.recyclerviewdrag.ItemTouchHelperViewHolder;
 import com.adithya321.sharesanalysis.utils.DateUtils;
 import com.adithya321.sharesanalysis.utils.NumberUtils;
+import com.adithya321.sharesanalysis.utils.StringUtils;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import io.realm.Realm;
 import io.realm.RealmList;
 
-public class ShareSalesAdapter extends RecyclerView.Adapter<ShareSalesAdapter.ViewHolder> {
+public class ShareSalesAdapter extends RecyclerView.Adapter<ShareSalesAdapter.ViewHolder>
+        implements ItemTouchHelperAdapter {
 
     private Context mContext;
     private List<Share> mShares;
@@ -34,9 +60,9 @@ public class ShareSalesAdapter extends RecyclerView.Adapter<ShareSalesAdapter.Vi
         this.listener = listener;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
         public final TextView name;
-        public final TextView totalSharesPurchased;
+        public final TextView totalSharesSold;
         public final TextView totalValue;
         public final TextView targetSalePrice;
         public final TextView currentShareValue;
@@ -47,7 +73,7 @@ public class ShareSalesAdapter extends RecyclerView.Adapter<ShareSalesAdapter.Vi
             super(view);
 
             name = (TextView) view.findViewById(R.id.share_name);
-            totalSharesPurchased = (TextView) view.findViewById(R.id.total_shares_sold);
+            totalSharesSold = (TextView) view.findViewById(R.id.total_shares_sold);
             totalValue = (TextView) view.findViewById(R.id.total_value);
             targetSalePrice = (TextView) view.findViewById(R.id.target_sale_price);
             currentShareValue = (TextView) view.findViewById(R.id.current_share_value);
@@ -60,6 +86,16 @@ public class ShareSalesAdapter extends RecyclerView.Adapter<ShareSalesAdapter.Vi
                     listener.onItemClick(view, getLayoutPosition());
                 }
             });
+        }
+
+        @Override
+        public void onItemSelected() {
+            itemView.setBackgroundColor(Color.LTGRAY);
+        }
+
+        @Override
+        public void onItemClear() {
+            itemView.setBackgroundColor(Color.WHITE);
         }
     }
 
@@ -116,20 +152,39 @@ public class ShareSalesAdapter extends RecyclerView.Adapter<ShareSalesAdapter.Vi
         currentNoOfShares = totalSharesPurchased - totalSharesSold;
         difference = share.getCurrentShareValue() - targetSalePrice;
 
-        viewHolder.name.setText(share.getName());
-        viewHolder.totalSharesPurchased.setText(String.valueOf(totalSharesSold));
+        viewHolder.name.setText(StringUtils.getCode(share.getName()));
+        viewHolder.totalSharesSold.setText(totalSharesSold + " shares sold");
         viewHolder.totalValue.setText(String.valueOf(NumberUtils.round(totalValueSold, 2)));
         viewHolder.targetSalePrice.setText(String.valueOf(NumberUtils.round(targetSalePrice, 2)));
         if (share.getCurrentShareValue() == 0.0)
             viewHolder.currentShareValue.setText("NA");
         else
             viewHolder.currentShareValue.setText(String.valueOf(NumberUtils.round(share.getCurrentShareValue(), 2)));
-        viewHolder.currentNoOfShares.setText(String.valueOf(currentNoOfShares));
+        viewHolder.currentNoOfShares.setText(currentNoOfShares + " shares left");
         viewHolder.difference.setText(String.valueOf(NumberUtils.round(difference, 2)));
+        if (difference < 0)
+            viewHolder.difference.setTextColor(getContext().getResources().getColor((R.color.red_500)));
+        else
+            viewHolder.difference.setTextColor(getContext().getResources().getColor((R.color.colorPrimary)));
     }
 
     @Override
     public int getItemCount() {
         return mShares.size();
+    }
+
+    @Override
+    public boolean onItemMove(int fromPosition, int toPosition) {
+        DatabaseHandler databaseHandler = new DatabaseHandler(getContext());
+        Realm realm = databaseHandler.getRealmInstance();
+        realm.beginTransaction();
+        long temp = 999;
+        mShares.get(fromPosition).setId(temp);
+        mShares.get(toPosition).setId(fromPosition);
+        mShares.get(fromPosition).setId(toPosition);
+        realm.commitTransaction();
+        Collections.swap(mShares, fromPosition, toPosition);
+        notifyItemMoved(fromPosition, toPosition);
+        return true;
     }
 }

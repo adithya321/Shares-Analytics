@@ -1,6 +1,25 @@
+/*
+ * Shares Analysis
+ * Copyright (C) 2016  Adithya J
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ */
+
 package com.adithya321.sharesanalysis.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,16 +27,23 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.adithya321.sharesanalysis.R;
+import com.adithya321.sharesanalysis.database.DatabaseHandler;
 import com.adithya321.sharesanalysis.database.Purchase;
 import com.adithya321.sharesanalysis.database.Share;
+import com.adithya321.sharesanalysis.recyclerviewdrag.ItemTouchHelperAdapter;
+import com.adithya321.sharesanalysis.recyclerviewdrag.ItemTouchHelperViewHolder;
 import com.adithya321.sharesanalysis.utils.NumberUtils;
+import com.adithya321.sharesanalysis.utils.StringUtils;
 
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 
+import io.realm.Realm;
 import io.realm.RealmList;
 
-public class SharePurchaseAdapter extends RecyclerView.Adapter<SharePurchaseAdapter.ViewHolder> {
+public class SharePurchaseAdapter extends RecyclerView.Adapter<SharePurchaseAdapter.ViewHolder>
+        implements ItemTouchHelperAdapter {
 
     private Context mContext;
     private List<Share> mShares;
@@ -31,7 +57,7 @@ public class SharePurchaseAdapter extends RecyclerView.Adapter<SharePurchaseAdap
         this.listener = listener;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
         public final TextView name;
         public final TextView totalSharesPurchased;
         public final TextView totalValue;
@@ -53,6 +79,16 @@ public class SharePurchaseAdapter extends RecyclerView.Adapter<SharePurchaseAdap
                     listener.onItemClick(view, getLayoutPosition());
                 }
             });
+        }
+
+        @Override
+        public void onItemSelected() {
+            itemView.setBackgroundColor(Color.LTGRAY);
+        }
+
+        @Override
+        public void onItemClear() {
+            itemView.setBackgroundColor(Color.WHITE);
         }
     }
 
@@ -97,8 +133,8 @@ public class SharePurchaseAdapter extends RecyclerView.Adapter<SharePurchaseAdap
         String date = calendar.get(Calendar.DAY_OF_MONTH) + "/" + (calendar.get(Calendar.MONTH) + 1)
                 + "/" + calendar.get(Calendar.YEAR);
 
-        viewHolder.name.setText(share.getName());
-        viewHolder.totalSharesPurchased.setText(String.valueOf(totalSharesPurchased));
+        viewHolder.name.setText(StringUtils.getCode(share.getName()));
+        viewHolder.totalSharesPurchased.setText(totalSharesPurchased + " shares");
         viewHolder.totalValue.setText(String.valueOf(NumberUtils.round(totalValue, 2)));
         viewHolder.averageShareValue.setText(String.valueOf(NumberUtils.round(averageShareValue, 2)));
         viewHolder.dateOfInitialPurchase.setText(date);
@@ -107,5 +143,20 @@ public class SharePurchaseAdapter extends RecyclerView.Adapter<SharePurchaseAdap
     @Override
     public int getItemCount() {
         return mShares.size();
+    }
+
+    @Override
+    public boolean onItemMove(int fromPosition, int toPosition) {
+        DatabaseHandler databaseHandler = new DatabaseHandler(getContext());
+        Realm realm = databaseHandler.getRealmInstance();
+        realm.beginTransaction();
+        long temp = 999;
+        mShares.get(fromPosition).setId(temp);
+        mShares.get(toPosition).setId(fromPosition);
+        mShares.get(fromPosition).setId(toPosition);
+        realm.commitTransaction();
+        Collections.swap(mShares, fromPosition, toPosition);
+        notifyItemMoved(fromPosition, toPosition);
+        return true;
     }
 }

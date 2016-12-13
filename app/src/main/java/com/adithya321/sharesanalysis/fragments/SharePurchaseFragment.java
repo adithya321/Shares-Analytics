@@ -1,32 +1,61 @@
+/*
+ * Shares Analysis
+ * Copyright (C) 2016  Adithya J
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ */
+
 package com.adithya321.sharesanalysis.fragments;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.adithya321.sharesanalysis.R;
+import com.adithya321.sharesanalysis.activities.SharePurchaseDetailActivity;
+import com.adithya321.sharesanalysis.adapters.FilterWithSpaceAdapter;
 import com.adithya321.sharesanalysis.adapters.SharePurchaseAdapter;
 import com.adithya321.sharesanalysis.database.DatabaseHandler;
 import com.adithya321.sharesanalysis.database.Purchase;
 import com.adithya321.sharesanalysis.database.Share;
+import com.adithya321.sharesanalysis.recyclerviewdrag.OnStartDragListener;
+import com.adithya321.sharesanalysis.recyclerviewdrag.SimpleItemTouchHelperCallback;
+import com.adithya321.sharesanalysis.utils.ShareUtils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -38,12 +67,15 @@ import java.util.Locale;
 
 import io.realm.RealmList;
 
-public class SharePurchaseFragment extends Fragment {
+public class SharePurchaseFragment extends Fragment implements OnStartDragListener {
 
     private DatabaseHandler databaseHandler;
     private int year_start, month_start, day_start;
     private List<Share> sharesList;
     private RecyclerView sharePurchasesRecyclerView;
+    private ItemTouchHelper mItemTouchHelper;
+    private TextView emptyTV;
+    private ImageView arrow;
 
     @Nullable
     @Override
@@ -52,6 +84,8 @@ public class SharePurchaseFragment extends Fragment {
 
         databaseHandler = new DatabaseHandler(getContext());
         sharePurchasesRecyclerView = (RecyclerView) root.findViewById(R.id.share_purchases_recycler_view);
+        emptyTV = (TextView) root.findViewById(R.id.empty);
+        arrow = (ImageView) root.findViewById(R.id.arrow);
         setRecyclerViewAdapter();
 
         FloatingActionButton addPurchaseFab = (FloatingActionButton) root.findViewById(R.id.add_purchase_fab);
@@ -65,7 +99,13 @@ public class SharePurchaseFragment extends Fragment {
                         WindowManager.LayoutParams.WRAP_CONTENT);
                 dialog.show();
 
-                final EditText name = (EditText) dialog.findViewById(R.id.share_name);
+                final AutoCompleteTextView name = (AutoCompleteTextView) dialog.findViewById(R.id.share_name);
+                List<String> nseList = ShareUtils.getNseList(getContext());
+                FilterWithSpaceAdapter<String> arrayAdapter = new FilterWithSpaceAdapter<>(getContext(),
+                        android.R.layout.simple_dropdown_item_1line, nseList);
+                name.setThreshold(1);
+                name.setAdapter(arrayAdapter);
+
                 final Spinner spinner = (Spinner) dialog.findViewById(R.id.existing_spinner);
 
                 ArrayList<String> shares = new ArrayList<>();
@@ -124,16 +164,20 @@ public class SharePurchaseFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         Share share = new Share();
+                        share.setId(databaseHandler.getNextKey("share"));
                         share.setPurchases(new RealmList<Purchase>());
                         Purchase purchase = new Purchase();
+                        purchase.setId(databaseHandler.getNextKey("purchase"));
 
                         if (newRB.isChecked()) {
                             String sName = name.getText().toString().trim();
                             if (sName.equals("")) {
                                 Toast.makeText(getActivity(), "Invalid Name", Toast.LENGTH_SHORT).show();
                                 return;
-                            } else
+                            } else {
                                 share.setName(sName);
+                                purchase.setName(sName);
+                            }
                         }
 
                         String stringStartDate = year_start + " " + month_start + " " + day_start;
@@ -170,6 +214,7 @@ public class SharePurchaseFragment extends Fragment {
                                 return;
                             }
                         } else {
+                            purchase.setName(spinner.getSelectedItem().toString());
                             databaseHandler.addPurchase(spinner.getSelectedItem().toString(), purchase);
                         }
                         setRecyclerViewAdapter();
@@ -194,29 +239,65 @@ public class SharePurchaseFragment extends Fragment {
 
     private void setRecyclerViewAdapter() {
         sharesList = databaseHandler.getShares();
+
+        if (sharesList.size() < 1) {
+            emptyTV.setVisibility(View.VISIBLE);
+            arrow.setVisibility(View.VISIBLE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                if (getResources().getConfiguration().orientation == 1) {
+                    arrow.setBackground(getResources().getDrawable(R.drawable.curved_line_vertical));
+                } else {
+                    arrow.setBackground((getResources().getDrawable(R.drawable.curved_line_horizontal)));
+                }
+            }
+        } else {
+            emptyTV.setVisibility(View.GONE);
+            arrow.setVisibility(View.GONE);
+        }
+
         SharePurchaseAdapter sharesAdapter = new SharePurchaseAdapter(getContext(), sharesList);
         sharesAdapter.setOnItemClickListener(new SharePurchaseAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
                 Share share = sharesList.get(position);
-
-                RealmList<Purchase> purchases = share.getPurchases();
-                String string = "";
-                for (Purchase purchase : purchases) {
-                    if (purchase.getType().equals("buy"))
-                        string = string.concat(purchase.toString() + "\n\n");
-                }
-                new AlertDialog.Builder(getActivity())
-                        .setTitle(share.getName())
-                        .setMessage(string)
-                        .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        }).show();
+                startActivity(new Intent(getActivity(), SharePurchaseDetailActivity.class)
+                        .putExtra("name", share.getName()));
             }
         });
         sharePurchasesRecyclerView.setAdapter(sharesAdapter);
         sharePurchasesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        sharePurchasesRecyclerView.setHasFixedSize(true);
+        sharePurchasesRecyclerView.setAdapter(sharesAdapter);
+        sharePurchasesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(sharesAdapter);
+        mItemTouchHelper = new ItemTouchHelper(callback);
+        mItemTouchHelper.attachToRecyclerView(sharePurchasesRecyclerView);
+    }
+
+    @Override
+    public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
+        mItemTouchHelper.startDrag(viewHolder);
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        try {
+            if (isVisibleToUser) setRecyclerViewAdapter();
+        } catch (Exception e) {
+            Log.e("visibleToUser", e.toString());
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        try {
+            setRecyclerViewAdapter();
+        } catch (Exception e) {
+            Log.e("onResume", e.toString());
+        }
     }
 }

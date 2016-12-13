@@ -1,16 +1,35 @@
+/*
+ * Shares Analysis
+ * Copyright (C) 2016  Adithya J
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ */
+
 package com.adithya321.sharesanalysis.fragments;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -27,10 +46,15 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.adithya321.sharesanalysis.R;
+import com.adithya321.sharesanalysis.activities.ShareSalesDetailActivity;
 import com.adithya321.sharesanalysis.adapters.ShareSalesAdapter;
 import com.adithya321.sharesanalysis.database.DatabaseHandler;
 import com.adithya321.sharesanalysis.database.Purchase;
 import com.adithya321.sharesanalysis.database.Share;
+import com.adithya321.sharesanalysis.recyclerviewdrag.OnStartDragListener;
+import com.adithya321.sharesanalysis.recyclerviewdrag.SimpleItemTouchHelperCallback;
+import com.adithya321.sharesanalysis.utils.AndroidUtils;
+import com.adithya321.sharesanalysis.utils.StringUtils;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -44,9 +68,8 @@ import java.util.List;
 import java.util.Locale;
 
 import io.realm.Realm;
-import io.realm.RealmList;
 
-public class ShareSalesFragment extends Fragment {
+public class ShareSalesFragment extends Fragment implements OnStartDragListener {
 
     private DatabaseHandler databaseHandler;
     private List<Share> sharesList;
@@ -54,6 +77,7 @@ public class ShareSalesFragment extends Fragment {
     private RecyclerView salesRecyclerView;
     private ShareSalesAdapter shareSalesAdapter;
     private MenuItem actionProgressItem, actionRefreshItem;
+    private ItemTouchHelper mItemTouchHelper;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -120,6 +144,8 @@ public class ShareSalesFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         Purchase purchase = new Purchase();
+                        purchase.setId(databaseHandler.getNextKey("purchase"));
+                        purchase.setName(spinner.getSelectedItem().toString());
 
                         String stringStartDate = year_start + " " + month_start + " " + day_start;
                         DateFormat format = new SimpleDateFormat("yyyy MM dd", Locale.ENGLISH);
@@ -176,26 +202,20 @@ public class ShareSalesFragment extends Fragment {
             @Override
             public void onItemClick(View itemView, int position) {
                 Share share = sharesList.get(position);
-
-                RealmList<Purchase> purchases = share.getPurchases();
-                String string = "";
-                for (Purchase purchase : purchases) {
-                    if (purchase.getType().equals("sell"))
-                        string = string.concat(purchase.toString() + "\n\n");
-                }
-                new AlertDialog.Builder(getActivity())
-                        .setTitle(share.getName())
-                        .setMessage(string)
-                        .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        }).show();
+                startActivity(new Intent(getActivity(), ShareSalesDetailActivity.class)
+                        .putExtra("name", share.getName()));
             }
         });
         salesRecyclerView.setAdapter(shareSalesAdapter);
         salesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        new CurrentShareValue().execute();
+        salesRecyclerView.setHasFixedSize(true);
+        salesRecyclerView.setAdapter(shareSalesAdapter);
+        salesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(shareSalesAdapter);
+        mItemTouchHelper = new ItemTouchHelper(callback);
+        mItemTouchHelper.attachToRecyclerView(salesRecyclerView);
+        if (AndroidUtils.isNetworkConnected(getContext())) new CurrentShareValue().execute();
     }
 
     private class CurrentShareValue extends AsyncTask<Void, Double, Void> {
@@ -220,10 +240,11 @@ public class ShareSalesFragment extends Fragment {
             try {
                 for (int i = 0; i < shares.size(); i++) {
                     Share share = shares.get(i);
-                    String url = "https://in.finance.yahoo.com/q?s=" + share.getName() + ".NS";
+                    String code = StringUtils.getCode(share.getName());
+                    String url = "https://in.finance.yahoo.com/q?s=" + code + ".NS";
                     Document document = Jsoup.connect(url).followRedirects(true).get();
                     try {
-                        currentShareValue = document.getElementById("yfs_l84_" + share.getName().toLowerCase()
+                        currentShareValue = document.getElementById("yfs_l84_" + code.toLowerCase()
                                 + ".ns").html();
                         Realm realm = db.getRealmInstance();
                         realm.beginTransaction();
@@ -265,8 +286,33 @@ public class ShareSalesFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_refresh) {
-            new CurrentShareValue().execute();
+            if (AndroidUtils.isNetworkConnected(getContext())) new CurrentShareValue().execute();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
+        mItemTouchHelper.startDrag(viewHolder);
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        try {
+            if (isVisibleToUser) setRecyclerViewAdapter();
+        } catch (Exception e) {
+            Log.e("visibleToUser", e.toString());
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        try {
+            setRecyclerViewAdapter();
+        } catch (Exception e) {
+            Log.e("onResume", e.toString());
+        }
     }
 }

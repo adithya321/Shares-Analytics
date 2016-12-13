@@ -1,15 +1,18 @@
 language: android
+jdk:
+- oraclejdk8
 sudo: required
 android:
   components:
   - platform-tools
   - tools
-  - build-tools-23.0.3
-  - android-23
+  - build-tools-24.0.0
+  - android-24
   - extra-android-support
   - extra-google-google_play_services
   - extra-android-m2repository
   - extra-google-m2repository
+  - addon-google_apis-google-24
   licenses:
   - .+
 before_install:
@@ -18,6 +21,8 @@ before_install:
 - openssl aes-256-cbc -K $encrypted_10f9f6d59221_key -iv $encrypted_10f9f6d59221_iv
   -in app/google-services.json.enc -out app/google-services.json -d
 - chmod +x gradlew
+- export JAVA8_HOME=/usr/lib/jvm/java-8-oracle
+- export JAVA_HOME=$JAVA8_HOME
 script:
 - ./gradlew build jacocoTestReport
 after_success:
